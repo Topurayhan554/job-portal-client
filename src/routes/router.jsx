@@ -13,6 +13,11 @@ import SavedJobs from "../pages/seeker/SavedJobs";
 import RecommendedJobs from "../pages/seeker/RecommendedJobs";
 import CvManager from "../pages/seeker/CvManager";
 import ProfileViews from "../pages/seeker/ProfileViews";
+import EmployerDashboard from "../pages/employer/EmployerDashboard";
+import EmployerProfile from "../pages/employer/Profile";
+import PostJob from "../pages/employer/PostJob";
+import MyJobs from "../pages/employer/MyJobs";
+import Applicants from "../pages/employer/Applicants";
 
 export const router = createBrowserRouter([
   {
@@ -80,26 +85,26 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // // Employer
-  // {
-  //   path: "/employer",
-  //   element: (
-  //     <PrivateRoute role="employer">
-  //       <DashboardLayout role="employer" />
-  //     </PrivateRoute>
-  //   ),
-  //   children: [
-  //     { path: "dashboard", element: <EmployerDashboard /> },
-  //     { path: "profile", element: <EmployerProfile /> },
-  //     { path: "post-job", element: <PostJob /> },
-  //     { path: "jobs", element: <MyJobs /> },
-  //     { path: "applicants", element: <Applicants /> },
-  //     // ✅ Shared
-  //     { path: "messages", element: <Messages /> },
-  //     { path: "notifications", element: <Notifications /> },
-  //     { path: "settings", element: <Settings /> },
-  //   ],
-  // },
+  // Employer
+  {
+    path: "/employer",
+    element: (
+      <PrivateRoute role="employer">
+        <DashboardLayout role="employer" />
+      </PrivateRoute>
+    ),
+    children: [
+      { path: "dashboard", element: <EmployerDashboard /> },
+      { path: "profile", element: <EmployerProfile /> },
+      { path: "post-job", element: <PostJob /> },
+      { path: "jobs", element: <MyJobs /> },
+      { path: "applicants", element: <Applicants /> },
+      // ✅ Shared
+      // { path: "messages", element: <Messages /> },
+      // { path: "notifications", element: <Notifications /> },
+      // { path: "settings", element: <Settings /> },
+    ],
+  },
 
   // // Admin
   // {
