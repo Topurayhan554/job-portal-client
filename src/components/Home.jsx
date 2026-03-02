@@ -12,20 +12,9 @@ import {
   FaClock,
 } from "react-icons/fa";
 
-// Animation Variants
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
-
-const fadeLeft = {
-  hidden: { opacity: 0, x: -40 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
-
-const fadeRight = {
-  hidden: { opacity: 0, x: 40 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 const stagger = {
@@ -41,7 +30,6 @@ const scaleIn = {
   },
 };
 
-// Fake Data
 const featuredJobs = [
   {
     id: 1,
@@ -146,10 +134,10 @@ const categories = [
 
 const Home = () => {
   return (
-    <div className="bg-[#0a0a14] text-white overflow-x-hidden">
+    <div className="bg-theme-primary text-theme-primary overflow-x-hidden">
       {/* ===== HERO ===== */}
       <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
-        {/* Background Glow */}
+        {/* Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-purple-700 opacity-10 rounded-full blur-[120px]"></div>
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-blue-700 opacity-10 rounded-full blur-[100px]"></div>
 
@@ -158,7 +146,7 @@ const Home = () => {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 text-purple-400 text-sm px-4 py-2 rounded-full mb-6"
+            className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 text-purple-500 text-sm px-4 py-2 rounded-full mb-6"
           >
             <FaRocket className="w-3 h-3" />
             AI-Powered Job Portal for Bangladesh
@@ -169,10 +157,10 @@ const Home = () => {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-extrabold leading-tight mb-6"
+            className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 text-theme-primary"
           >
             Find Your{" "}
-            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
               Dream Job
             </span>{" "}
             Today
@@ -183,7 +171,7 @@ const Home = () => {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
-            className="text-gray-400 text-xl mb-10 max-w-2xl mx-auto"
+            className="text-theme-muted text-xl mb-10 max-w-2xl mx-auto"
           >
             Connect with top companies, get AI-powered job recommendations, and
             land your dream career faster than ever.
@@ -198,11 +186,11 @@ const Home = () => {
             className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10"
           >
             <div className="relative flex-1">
-              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
               <input
                 type="text"
                 placeholder="Job title, skill, or company..."
-                className="w-full bg-[#1a1a2e] border border-gray-700 rounded-xl pl-11 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                className="input-theme w-full border rounded-xl pl-11 pr-4 py-4 focus:ring-2 focus:ring-purple-500 transition"
               />
             </div>
             <Link
@@ -221,7 +209,7 @@ const Home = () => {
             transition={{ delay: 0.4 }}
             className="flex flex-wrap gap-2 justify-center"
           >
-            <span className="text-gray-500 text-sm">Popular:</span>
+            <span className="text-theme-muted text-sm">Popular:</span>
             {[
               "React Developer",
               "UI Designer",
@@ -232,7 +220,7 @@ const Home = () => {
               <Link
                 key={tag}
                 to="/jobs"
-                className="text-sm text-gray-400 hover:text-purple-400 border border-gray-700 hover:border-purple-500/50 px-3 py-1 rounded-full transition"
+                className="text-sm text-theme-secondary hover:text-purple-500 border border-theme hover:border-purple-500/50 px-3 py-1 rounded-full transition"
               >
                 {tag}
               </Link>
@@ -242,7 +230,7 @@ const Home = () => {
       </section>
 
       {/* ===== STATS ===== */}
-      <section className="py-16 border-y border-gray-800 bg-[#0d0d1f]">
+      <section className="py-16 border-y border-theme bg-theme-secondary">
         <div className="max-w-6xl mx-auto px-6">
           <motion.div
             variants={stagger}
@@ -253,10 +241,10 @@ const Home = () => {
           >
             {stats.map((stat, i) => (
               <motion.div key={i} variants={scaleIn}>
-                <p className="text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                <p className="text-4xl font-extrabold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
                   {stat.value}
                 </p>
-                <p className="text-gray-400 text-sm mt-2">{stat.label}</p>
+                <p className="text-theme-muted text-sm mt-2">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -264,7 +252,7 @@ const Home = () => {
       </section>
 
       {/* ===== CATEGORIES ===== */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-theme-primary">
         <div className="max-w-6xl mx-auto">
           <motion.div
             variants={fadeUp}
@@ -273,10 +261,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <h2 className="text-4xl font-bold text-theme-primary mb-4">
               Browse by Category
             </h2>
-            <p className="text-gray-400">
+            <p className="text-theme-muted">
               Explore thousands of jobs across different industries
             </p>
           </motion.div>
@@ -292,13 +280,13 @@ const Home = () => {
               <motion.div key={i} variants={scaleIn}>
                 <Link
                   to="/jobs"
-                  className="group flex flex-col items-center gap-3 bg-[#1a1a2e] border border-gray-800 hover:border-purple-500/50 rounded-2xl p-6 text-center hover:bg-purple-500/5 transition"
+                  className="group card-theme flex flex-col items-center gap-3 border hover:border-purple-500/50 rounded-2xl p-6 text-center hover:bg-purple-500/5 transition"
                 >
                   <span className="text-3xl">{cat.icon}</span>
-                  <p className="text-white font-semibold group-hover:text-purple-400 transition">
+                  <p className="text-theme-primary font-semibold group-hover:text-purple-500 transition">
                     {cat.label}
                   </p>
-                  <p className="text-gray-500 text-xs">{cat.count}</p>
+                  <p className="text-theme-muted text-xs">{cat.count}</p>
                 </Link>
               </motion.div>
             ))}
@@ -307,7 +295,7 @@ const Home = () => {
       </section>
 
       {/* ===== FEATURED JOBS ===== */}
-      <section className="py-20 px-6 bg-[#0d0d1f]">
+      <section className="py-20 px-6 bg-theme-secondary">
         <div className="max-w-6xl mx-auto">
           <motion.div
             variants={fadeUp}
@@ -317,16 +305,16 @@ const Home = () => {
             className="flex items-center justify-between mb-12"
           >
             <div>
-              <h2 className="text-4xl font-bold text-white mb-2">
+              <h2 className="text-4xl font-bold text-theme-primary mb-2">
                 Featured Jobs
               </h2>
-              <p className="text-gray-400">
+              <p className="text-theme-muted">
                 Hand-picked opportunities from top companies
               </p>
             </div>
             <Link
               to="/jobs"
-              className="hidden md:flex items-center gap-2 text-purple-400 hover:text-purple-300 border border-purple-500/30 hover:border-purple-500 px-4 py-2 rounded-xl transition text-sm"
+              className="hidden md:flex items-center gap-2 text-purple-500 hover:text-purple-400 border border-purple-500/30 hover:border-purple-500 px-4 py-2 rounded-xl transition text-sm"
             >
               View All Jobs <FaArrowRight className="w-3 h-3" />
             </Link>
@@ -347,24 +335,25 @@ const Home = () => {
               >
                 <Link
                   to="/jobs"
-                  className="group block bg-[#12121f] border border-gray-800 hover:border-purple-500/40 rounded-2xl p-6 hover:bg-purple-500/5 transition"
+                  className="group card-theme block border hover:border-purple-500/40 rounded-2xl p-6 hover:bg-purple-500/5 transition"
                 >
-                  {/* Company Avatar */}
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-gray-700 rounded-xl flex items-center justify-center">
-                      <FaBriefcase className="text-purple-400 w-5 h-5" />
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-theme rounded-xl flex items-center justify-center">
+                      <FaBriefcase className="text-purple-500 w-5 h-5" />
                     </div>
-                    <span className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-1 rounded-full">
+                    <span className="text-xs bg-purple-500/10 text-purple-500 border border-purple-500/20 px-2 py-1 rounded-full">
                       {job.tag}
                     </span>
                   </div>
 
-                  <h3 className="text-white font-semibold text-lg mb-1 group-hover:text-purple-400 transition">
+                  <h3 className="text-theme-primary font-semibold text-lg mb-1 group-hover:text-purple-500 transition">
                     {job.title}
                   </h3>
-                  <p className="text-gray-400 text-sm mb-4">{job.company}</p>
+                  <p className="text-theme-secondary text-sm mb-4">
+                    {job.company}
+                  </p>
 
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                  <div className="flex items-center gap-4 text-xs text-theme-muted">
                     <span className="flex items-center gap-1">
                       <FaMapMarkerAlt className="w-3 h-3" /> {job.location}
                     </span>
@@ -373,11 +362,11 @@ const Home = () => {
                     </span>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-gray-800 flex items-center justify-between">
-                    <span className="text-purple-400 font-semibold text-sm">
+                  <div className="mt-4 pt-4 border-t border-theme flex items-center justify-between">
+                    <span className="text-purple-500 font-semibold text-sm">
                       {job.salary}
                     </span>
-                    <span className="text-xs text-gray-500 group-hover:text-purple-400 transition flex items-center gap-1">
+                    <span className="text-xs text-theme-muted group-hover:text-purple-500 transition flex items-center gap-1">
                       Apply Now <FaArrowRight className="w-3 h-3" />
                     </span>
                   </div>
@@ -395,7 +384,7 @@ const Home = () => {
           >
             <Link
               to="/jobs"
-              className="text-purple-400 hover:text-purple-300 transition text-sm"
+              className="text-purple-500 hover:text-purple-400 transition text-sm"
             >
               View all jobs →
             </Link>
@@ -404,7 +393,7 @@ const Home = () => {
       </section>
 
       {/* ===== FEATURES ===== */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-theme-primary">
         <div className="max-w-6xl mx-auto">
           <motion.div
             variants={fadeUp}
@@ -413,10 +402,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <h2 className="text-4xl font-bold text-theme-primary mb-4">
               Why Choose JobPortal?
             </h2>
-            <p className="text-gray-400 max-w-xl mx-auto">
+            <p className="text-theme-muted max-w-xl mx-auto">
               We use cutting-edge AI technology to make your job search faster
               and smarter.
             </p>
@@ -434,15 +423,17 @@ const Home = () => {
                 key={i}
                 variants={scaleIn}
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="bg-[#1a1a2e] border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition"
+                className="card-theme border hover:border-theme rounded-2xl p-6 transition"
               >
                 <div
                   className={`w-12 h-12 bg-gradient-to-br ${f.color} rounded-xl flex items-center justify-center text-white mb-4`}
                 >
                   {f.icon}
                 </div>
-                <h3 className="text-white font-semibold mb-2">{f.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
+                <h3 className="text-theme-primary font-semibold mb-2">
+                  {f.title}
+                </h3>
+                <p className="text-theme-muted text-sm leading-relaxed">
                   {f.desc}
                 </p>
               </motion.div>
@@ -452,23 +443,22 @@ const Home = () => {
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-theme-secondary">
         <div className="max-w-4xl mx-auto">
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="relative bg-gradient-to-br from-purple-900/50 to-blue-900/50 border border-purple-500/20 rounded-3xl p-12 text-center overflow-hidden"
+            className="relative bg-gradient-to-br from-purple-900/40 to-blue-900/40 border border-purple-500/20 rounded-3xl p-12 text-center overflow-hidden"
           >
-            {/* Glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-purple-600 opacity-20 rounded-full blur-3xl"></div>
 
             <div className="relative z-10">
-              <h2 className="text-4xl font-bold text-white mb-4">
+              <h2 className="text-4xl font-bold text-theme-primary mb-4">
                 Ready to Find Your Dream Job?
               </h2>
-              <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+              <p className="text-theme-muted mb-8 max-w-xl mx-auto">
                 Join 50,000+ job seekers who found their perfect career through
                 JobPortal.
               </p>
@@ -481,7 +471,7 @@ const Home = () => {
                 </Link>
                 <Link
                   to="/jobs"
-                  className="border border-gray-600 text-gray-300 hover:text-white hover:border-gray-400 px-8 py-4 rounded-xl font-semibold transition flex items-center justify-center gap-2"
+                  className="border border-theme text-theme-secondary hover:text-theme-primary hover:border-purple-500/50 px-8 py-4 rounded-xl font-semibold transition flex items-center justify-center gap-2"
                 >
                   Browse Jobs
                 </Link>

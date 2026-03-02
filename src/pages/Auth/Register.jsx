@@ -10,14 +10,20 @@ import {
   FiUser,
   FiPhone,
   FiCheckCircle,
+  FiImage,
 } from "react-icons/fi";
+
 import toast from "react-hot-toast";
+import axios from "axios";
 import useAuth from "../../hooks/useAuth";
+import api from "../../services/api";
 
 const Register = () => {
-  const { signUpFunc, signInGoogle, updateUserProfile } = useAuth();
+  const { signUpFunc, signInGoogle, updateUserProfile, syncUserWithDatabase } =
+    useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -58,6 +64,27 @@ const Register = () => {
     return "Strong";
   };
 
+  // Photo preview
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPhotoPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // imgbb তে photo upload করো
+  const uploadToImgbb = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await axios.post(
+      `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+      formData,
+    );
+    return res.data.data.url;
+  };
+
   // DB তে User save করো
   const saveUserToDB = async (firebaseUser, extraData = {}) => {
     try {
@@ -78,21 +105,41 @@ const Register = () => {
 
   const handleRegister = async (data) => {
     try {
+      const profileImg = data.photo?.[0];
+
       // 1. Firebase signup
       const userCredential = await signUpFunc(data.email, data.password);
       const firebaseUser = userCredential.user;
 
-      // 2. Firebase profile update
+      // 2. imgbb তে photo upload
+      let photoURL = "";
+      if (profileImg) {
+        try {
+          photoURL = await uploadToImgbb(profileImg);
+        } catch (err) {
+          console.error("Photo upload failed:", err);
+          toast.error("Photo upload failed, continuing without photo");
+        }
+      }
+
+      // 3. Firebase profile update
       await updateUserProfile({
         displayName: data.name,
-        photoURL: "",
+        photoURL: photoURL || "",
       });
 
-      // 3. DB তে save করো
+      // 4. DB তে save করো
       await saveUserToDB(
-        { ...firebaseUser, displayName: data.name },
+        { ...firebaseUser, displayName: data.name, photoURL },
         { name: data.name, phone: data.phone || "", role: data.role },
       );
+
+      // 5. Sync করো
+      await syncUserWithDatabase({
+        ...firebaseUser,
+        displayName: data.name,
+        photoURL,
+      });
 
       toast.success("Account created successfully! 🎉");
       navigate(location?.state || "/");
@@ -119,7 +166,9 @@ const Register = () => {
   };
 
   const inputClass = (error) =>
-    `w-full bg-[#12121f] border rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${error ? "border-red-500" : "border-gray-700"}`;
+    `w-full bg-[#12121f] border rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${
+      error ? "border-red-500" : "border-gray-700"
+    }`;
 
   return (
     <div className="min-h-screen flex bg-[#0a0a14]">
@@ -326,6 +375,47 @@ const Register = () => {
                   <FiAlertCircle className="w-4 h-4" /> {errors.phone.message}
                 </p>
               )}
+            </div>
+
+            {/* Photo Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Profile Photo <span className="text-gray-500">(Optional)</span>
+              </label>
+              <div className="flex items-center gap-4">
+                {/* Preview */}
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#12121f] border border-gray-700 flex items-center justify-center flex-shrink-0">
+                  {photoPreview ? (
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-6 h-6 text-gray-500" />
+                  )}
+                </div>
+
+                {/* Upload Button */}
+                <label className="flex-1 cursor-pointer">
+                  <div className="flex items-center gap-2 bg-[#12121f] border border-gray-700 border-dashed rounded-xl px-4 py-3 hover:border-purple-500 hover:bg-purple-500/5 transition">
+                    <FiImage className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-400 text-sm">
+                      {photoPreview ? "Change photo" : "Upload photo"}
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    {...register("photo")}
+                    onChange={(e) => {
+                      register("photo").onChange(e);
+                      handlePhotoChange(e);
+                    }}
+                  />
+                </label>
+              </div>
             </div>
 
             {/* Password */}

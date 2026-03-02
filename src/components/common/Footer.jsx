@@ -9,7 +9,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#0d0d1f] border-t border-gray-800 text-gray-400">
+    <footer className="bg-theme-secondary border-t border-theme">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
@@ -18,14 +18,13 @@ const Footer = () => {
               <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
                 <FaBriefcase className="text-white w-4 h-4" />
               </div>
-              <span className="text-xl font-bold text-white">
-                Job<span className="text-purple-400">Portal</span>
+              <span className="text-xl font-bold text-theme-primary">
+                Job<span className="text-purple-500">Portal</span>
               </span>
             </Link>
-            <p className="text-sm leading-relaxed text-gray-500">
+            <p className="text-sm leading-relaxed text-theme-muted">
               Find your dream job or hire the best talent — all in one place.
             </p>
-            {/* Social */}
             <div className="flex gap-3 mt-5">
               {[
                 { icon: <FaGithub />, href: "#" },
@@ -36,7 +35,7 @@ const Footer = () => {
                 <a
                   key={i}
                   href={s.href}
-                  className="w-9 h-9 bg-white/5 border border-gray-700 rounded-xl flex items-center justify-center hover:bg-purple-500/20 hover:border-purple-500/50 hover:text-purple-400 transition"
+                  className="w-9 h-9 border border-theme rounded-xl flex items-center justify-center text-theme-muted hover:bg-purple-500/20 hover:border-purple-500/50 hover:text-purple-400 transition"
                 >
                   {s.icon}
                 </a>
@@ -46,7 +45,9 @@ const Footer = () => {
 
           {/* For Job Seekers */}
           <div>
-            <h4 className="text-white font-semibold mb-4">For Job Seekers</h4>
+            <h4 className="text-theme-primary font-semibold mb-4">
+              For Job Seekers
+            </h4>
             <ul className="space-y-2 text-sm">
               {[
                 { label: "Browse Jobs", to: "/jobs" },
@@ -57,7 +58,7 @@ const Footer = () => {
                 <li key={i}>
                   <Link
                     to={item.to}
-                    className="hover:text-purple-400 transition"
+                    className="text-theme-muted hover:text-purple-500 transition"
                   >
                     {item.label}
                   </Link>
@@ -68,7 +69,9 @@ const Footer = () => {
 
           {/* For Employers */}
           <div>
-            <h4 className="text-white font-semibold mb-4">For Employers</h4>
+            <h4 className="text-theme-primary font-semibold mb-4">
+              For Employers
+            </h4>
             <ul className="space-y-2 text-sm">
               {[
                 { label: "Post a Job", to: "/employer/post-job" },
@@ -79,7 +82,7 @@ const Footer = () => {
                 <li key={i}>
                   <Link
                     to={item.to}
-                    className="hover:text-purple-400 transition"
+                    className="text-theme-muted hover:text-purple-500 transition"
                   >
                     {item.label}
                   </Link>
@@ -90,7 +93,7 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Company</h4>
+            <h4 className="text-theme-primary font-semibold mb-4">Company</h4>
             <ul className="space-y-2 text-sm">
               {[
                 { label: "About Us", to: "#" },
@@ -101,7 +104,7 @@ const Footer = () => {
                 <li key={i}>
                   <Link
                     to={item.to}
-                    className="hover:text-purple-400 transition"
+                    className="text-theme-muted hover:text-purple-500 transition"
                   >
                     {item.label}
                   </Link>
@@ -112,13 +115,13 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm">
-          <p className="text-gray-600">
+        <div className="border-t border-theme mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm">
+          <p className="text-theme-muted">
             © {new Date().getFullYear()} JobPortal. All rights reserved.
           </p>
-          <p className="text-gray-600">
+          <p className="text-theme-muted">
             Built with ❤️ using{" "}
-            <span className="text-purple-400">MERN Stack</span>
+            <span className="text-purple-500">MERN Stack</span>
           </p>
         </div>
       </div>

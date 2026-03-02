@@ -4,7 +4,15 @@ import MainLayouts from "../layouts/mainLayouts";
 import AuthLayouts from "../layouts/AuthLayouts";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
-import DashboardLayout from "../layouts/DashboardLayout";
+import PrivateRoute from "./PrivateRoute";
+import DashboardLayout from ".././layouts/DashboardLayout";
+import SeekerDashboard from "../pages/seeker/SeekerDashboard";
+import Profile from "../pages/seeker/Profile";
+import Applications from "../pages/seeker/Applications";
+import SavedJobs from "../pages/seeker/SavedJobs";
+import RecommendedJobs from "../pages/seeker/RecommendedJobs";
+import CvManager from "../pages/seeker/CvManager";
+import ProfileViews from "../pages/seeker/ProfileViews";
 
 export const router = createBrowserRouter([
   {
@@ -31,8 +39,86 @@ export const router = createBrowserRouter([
       },
     ],
   },
+
+  // Seeker
   {
-    path: "dashboard",
-    element: <DashboardLayout />,
+    path: "/seeker",
+    element: (
+      <PrivateRoute role="seeker">
+        <DashboardLayout role="seeker"></DashboardLayout>
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: "dashboard",
+        element: <SeekerDashboard />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
+      {
+        path: "applications",
+        element: <Applications />,
+      },
+      {
+        path: "saved",
+        element: <SavedJobs />,
+      },
+      {
+        path: "recommended",
+        element: <RecommendedJobs />,
+      },
+      {
+        path: "cv",
+        element: <CvManager />,
+      },
+      {
+        path: "views",
+        element: <ProfileViews />,
+      },
+    ],
   },
+
+  // // Employer
+  // {
+  //   path: "/employer",
+  //   element: (
+  //     <PrivateRoute role="employer">
+  //       <DashboardLayout role="employer" />
+  //     </PrivateRoute>
+  //   ),
+  //   children: [
+  //     { path: "dashboard", element: <EmployerDashboard /> },
+  //     { path: "profile", element: <EmployerProfile /> },
+  //     { path: "post-job", element: <PostJob /> },
+  //     { path: "jobs", element: <MyJobs /> },
+  //     { path: "applicants", element: <Applicants /> },
+  //     // ✅ Shared
+  //     { path: "messages", element: <Messages /> },
+  //     { path: "notifications", element: <Notifications /> },
+  //     { path: "settings", element: <Settings /> },
+  //   ],
+  // },
+
+  // // Admin
+  // {
+  //   path: "/admin",
+  //   element: (
+  //     <PrivateRoute role="admin">
+  //       <DashboardLayout role="admin" />
+  //     </PrivateRoute>
+  //   ),
+  //   children: [
+  //     { path: "dashboard", element: <AdminDashboard /> },
+  //     { path: "users", element: <ManageUsers /> },
+  //     { path: "jobs", element: <ManageJobs /> },
+  //     { path: "applications", element: <AdminApplications /> },
+  //     { path: "security", element: <Security /> },
+  //     // ✅ Shared
+  //     { path: "messages", element: <Messages /> },
+  //     { path: "notifications", element: <Notifications /> },
+  //     { path: "settings", element: <Settings /> },
+  //   ],
+  // },
 ]);

@@ -1,13 +1,13 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext/AuthContext";
+import useAuth from "../hooks/useAuth";
 
 const PrivateRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-theme-primary">
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
