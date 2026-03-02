@@ -18,6 +18,9 @@ import EmployerProfile from "../pages/employer/Profile";
 import PostJob from "../pages/employer/PostJob";
 import MyJobs from "../pages/employer/MyJobs";
 import Applicants from "../pages/employer/Applicants";
+import Messages from "../pages/shared/Message";
+import Notifications from "../pages/shared/Notifications";
+import Settings from "../pages/shared/Setting";
 
 export const router = createBrowserRouter([
   {
@@ -82,6 +85,11 @@ export const router = createBrowserRouter([
         path: "views",
         element: <ProfileViews />,
       },
+
+      // shared
+      { path: "messages", element: <Messages /> },
+      { path: "notifications", element: <Notifications /> },
+      { path: "settings", element: <Settings /> },
     ],
   },
 
