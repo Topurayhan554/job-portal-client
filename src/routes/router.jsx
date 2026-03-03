@@ -21,6 +21,13 @@ import Applicants from "../pages/employer/Applicants";
 import Messages from "../pages/shared/Message";
 import Notifications from "../pages/shared/Notifications";
 import Settings from "../pages/shared/Setting";
+import Jobs from "../pages/Job/Jobs";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import ManageUsers from "../pages/admin/ManageUsers";
+import ManageJobs from "../pages/admin/ManageJobs";
+import AdminApplications from "../pages/admin/AdminApplications";
+import { AiFillSecurityScan } from "react-icons/ai";
+import Security from "../pages/admin/Security";
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +37,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "/jobs",
+        element: <Jobs />,
       },
     ],
   },
@@ -107,31 +118,31 @@ export const router = createBrowserRouter([
       { path: "post-job", element: <PostJob /> },
       { path: "jobs", element: <MyJobs /> },
       { path: "applicants", element: <Applicants /> },
-      // ✅ Shared
-      // { path: "messages", element: <Messages /> },
-      // { path: "notifications", element: <Notifications /> },
-      // { path: "settings", element: <Settings /> },
+      // ✅ Shared  
+      { path: "messages", element: <Messages /> },
+      { path: "notifications", element: <Notifications /> },
+      { path: "settings", element: <Settings /> },
     ],
   },
 
-  // // Admin
-  // {
-  //   path: "/admin",
-  //   element: (
-  //     <PrivateRoute role="admin">
-  //       <DashboardLayout role="admin" />
-  //     </PrivateRoute>
-  //   ),
-  //   children: [
-  //     { path: "dashboard", element: <AdminDashboard /> },
-  //     { path: "users", element: <ManageUsers /> },
-  //     { path: "jobs", element: <ManageJobs /> },
-  //     { path: "applications", element: <AdminApplications /> },
-  //     { path: "security", element: <Security /> },
-  //     // ✅ Shared
-  //     { path: "messages", element: <Messages /> },
-  //     { path: "notifications", element: <Notifications /> },
-  //     { path: "settings", element: <Settings /> },
-  //   ],
-  // },
+  // Admin
+  {
+    path: "/admin",
+    element: (
+      <PrivateRoute role="admin">
+        <DashboardLayout role="admin" />
+      </PrivateRoute>
+    ),
+    children: [
+      { path: "dashboard", element: <AdminDashboard /> },
+      { path: "users", element: <ManageUsers /> },
+      { path: "jobs", element: <ManageJobs /> },
+      { path: "applications", element: <AdminApplications /> },
+      { path: "security", element: <Security /> },
+      // ✅ Shared
+      { path: "messages", element: <Messages /> },
+      { path: "notifications", element: <Notifications /> },
+      { path: "settings", element: <Settings /> },
+    ],
+  },
 ]);

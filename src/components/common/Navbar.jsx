@@ -62,6 +62,9 @@ const Navbar = () => {
     return "/";
   };
 
+  //profilePhoto first, photoURL fallback
+  const getPhoto = () => user?.profilePhoto || user?.photoURL || null;
+
   const navLinks = [
     { name: "Browse Jobs", path: "/jobs" },
     ...(user?.role === "employer"
@@ -76,10 +79,35 @@ const Navbar = () => {
     admin: "bg-red-500",
   };
 
+  // ===== Reusable Avatar =====
+  const Avatar = ({ size = "sm", border = "" }) => {
+    const dimensions = size === "sm" ? "w-8 h-8" : "w-12 h-12";
+    const textSize = size === "sm" ? "text-sm" : "text-lg";
+    const rounded = size === "sm" ? "rounded-lg" : "rounded-xl";
+
+    return getPhoto() ? (
+      <img
+        src={getPhoto()}
+        alt={user?.name}
+        className={`${dimensions} ${rounded} object-cover ${border}`}
+      />
+    ) : (
+      <div
+        className={`${dimensions} bg-gradient-to-br from-purple-500 to-blue-500 ${rounded} flex items-center justify-center ${border}`}
+      >
+        <span className={`text-white ${textSize} font-bold`}>
+          {user?.name?.charAt(0).toUpperCase()}
+        </span>
+      </div>
+    );
+  };
+
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "navbar-scrolled" : "bg-transparent"}`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? "navbar-scrolled" : "bg-transparent"
+        }`}
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo */}
@@ -142,13 +170,15 @@ const Navbar = () => {
               </>
             ) : (
               <div className="relative" ref={profileRef}>
+                {/* Profile Button */}
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   className="flex items-center gap-2 border border-theme bg-black/5 dark:bg-white/5 hover:border-purple-500/50 rounded-xl px-3 py-2 transition-all duration-300 group"
                 >
-                  {user.photoURL ? (
+                  {/* Avatar — profilePhoto || photoURL */}
+                  {getPhoto() ? (
                     <img
-                      src={user.photoURL}
+                      src={getPhoto()}
                       alt={user.name}
                       className="w-8 h-8 rounded-lg object-cover border-2 border-transparent group-hover:border-purple-500 transition"
                     />
@@ -171,12 +201,14 @@ const Navbar = () => {
 
                 {/* Dropdown */}
                 {showProfileMenu && (
-                  <div className="absolute top-full right-0 mt-3 w-72 bg-theme-card border border-theme rounded-2xl shadow-2xl overflow-hidden">
+                  <div className="absolute top-full right-0 mt-3 w-72 bg-theme-card border border-theme rounded-2xl shadow-2xl overflow-hidden z-50">
+                    {/* Dropdown Header */}
                     <div className="p-4 bg-gradient-to-r from-purple-600 to-blue-600">
                       <div className="flex items-center gap-3">
-                        {user.photoURL ? (
+                        {/* Dropdown Avatar */}
+                        {getPhoto() ? (
                           <img
-                            src={user.photoURL}
+                            src={getPhoto()}
                             alt={user.name}
                             className="w-12 h-12 rounded-xl border-2 border-white object-cover"
                           />
@@ -198,13 +230,16 @@ const Navbar = () => {
                       </div>
                       <div className="mt-3">
                         <span
-                          className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase text-white ${roleColor[user.role] || "bg-gray-500"}`}
+                          className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase text-white ${
+                            roleColor[user.role] || "bg-gray-500"
+                          }`}
                         >
                           {user.role}
                         </span>
                       </div>
                     </div>
 
+                    {/* Dropdown Links */}
                     <div className="p-2">
                       <Link
                         to={getDashboardLink()}
@@ -264,7 +299,11 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         <div
-          className={`md:hidden transition-all duration-300 ease-in-out ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden"}`}
+          className={`md:hidden transition-all duration-300 ease-in-out ${
+            menuOpen
+              ? "max-h-screen opacity-100"
+              : "max-h-0 opacity-0 overflow-hidden"
+          }`}
         >
           <div className="px-6 pb-6 pt-2 bg-theme-nav backdrop-blur-lg border-t border-theme">
             <div className="space-y-1 mb-4">
@@ -306,11 +345,12 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div>
+                  {/* Mobile — profilePhoto || photoURL */}
                   <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-4 mb-3">
                     <div className="flex items-center gap-3">
-                      {user.photoURL ? (
+                      {getPhoto() ? (
                         <img
-                          src={user.photoURL}
+                          src={getPhoto()}
                           alt={user.name}
                           className="w-12 h-12 rounded-xl border-2 border-white object-cover"
                         />
@@ -332,7 +372,9 @@ const Navbar = () => {
                     </div>
                     <div className="mt-2">
                       <span
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase text-white ${roleColor[user.role] || "bg-gray-500"}`}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase text-white ${
+                          roleColor[user.role] || "bg-gray-500"
+                        }`}
                       >
                         {user.role}
                       </span>
@@ -346,6 +388,15 @@ const Navbar = () => {
                   >
                     <FiUser className="w-4 h-4" />
                     <span className="text-sm font-medium">Dashboard</span>
+                  </Link>
+
+                  <Link
+                    to="/settings"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-theme-secondary hover:bg-black/5 dark:hover:bg-white/5 transition mb-2"
+                  >
+                    <FiSettings className="w-4 h-4" />
+                    <span className="text-sm font-medium">Settings</span>
                   </Link>
 
                   <button

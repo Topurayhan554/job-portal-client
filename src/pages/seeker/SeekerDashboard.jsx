@@ -15,141 +15,85 @@ import {
   FiAward,
 } from "react-icons/fi";
 import { FaRocket } from "react-icons/fa";
-import useAuth from "../../hooks/useAuth";
+import { useSeekerStats, useRecommendedJobs } from "../../hooks/useSeeker";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
-
-const stagger = {
-  visible: { transition: { staggerChildren: 0.1 } },
-};
-
+const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 const scaleIn = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
 };
 
-// Fake Data
-const stats = [
-  {
-    label: "Applied Jobs",
-    value: 12,
-    icon: <FiBriefcase />,
-    color: "from-purple-500 to-purple-700",
-    bg: "bg-purple-500/10",
-    text: "text-purple-500",
-  },
-  {
-    label: "Under Review",
-    value: 5,
-    icon: <FiClock />,
-    color: "from-yellow-500 to-yellow-700",
-    bg: "bg-yellow-500/10",
-    text: "text-yellow-500",
-  },
-  {
-    label: "Interviews",
-    value: 3,
-    icon: <FiCheckCircle />,
-    color: "from-green-500 to-green-700",
-    bg: "bg-green-500/10",
-    text: "text-green-500",
-  },
-  {
-    label: "Rejected",
-    value: 2,
-    icon: <FiXCircle />,
-    color: "from-red-500 to-red-700",
-    bg: "bg-red-500/10",
-    text: "text-red-500",
-  },
-];
+const statusColor = {
+  Interview: "text-green-500 bg-green-500/10",
+  "Under Review": "text-yellow-500 bg-yellow-500/10",
+  Rejected: "text-red-500 bg-red-500/10",
+  Applied: "text-blue-500 bg-blue-500/10",
+  Shortlisted: "text-purple-500 bg-purple-500/10",
+  Hired: "text-emerald-500 bg-emerald-500/10",
+};
 
-const recentApplications = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    company: "TechCorp BD",
-    location: "Dhaka",
-    status: "Interview",
-    date: "2 days ago",
-    statusColor: "text-green-500 bg-green-500/10",
-  },
-  {
-    id: 2,
-    title: "React Developer",
-    company: "SoftGen Ltd",
-    location: "Remote",
-    status: "Under Review",
-    date: "5 days ago",
-    statusColor: "text-yellow-500 bg-yellow-500/10",
-  },
-  {
-    id: 3,
-    title: "UI/UX Designer",
-    company: "Creative Studio",
-    location: "Chittagong",
-    status: "Rejected",
-    date: "1 week ago",
-    statusColor: "text-red-500 bg-red-500/10",
-  },
-  {
-    id: 4,
-    title: "Full Stack Engineer",
-    company: "CloudBase",
-    location: "Dhaka",
-    status: "Applied",
-    date: "1 week ago",
-    statusColor: "text-blue-500 bg-blue-500/10",
-  },
-];
-
-const recommendedJobs = [
-  {
-    id: 1,
-    title: "Senior React Developer",
-    company: "NextGen Tech",
-    location: "Remote",
-    salary: "৳60k-80k",
-    match: 95,
-    tag: "React",
-  },
-  {
-    id: 2,
-    title: "Frontend Engineer",
-    company: "PixelCraft",
-    location: "Dhaka",
-    salary: "৳45k-65k",
-    match: 88,
-    tag: "Vue.js",
-  },
-  {
-    id: 3,
-    title: "JavaScript Developer",
-    company: "DevHouse",
-    location: "Remote",
-    salary: "৳50k-70k",
-    match: 82,
-    tag: "Node.js",
-  },
-];
-
-const profileTasks = [
-  { label: "Upload your resume", done: true },
-  { label: "Add your skills", done: true },
-  { label: "Complete work experience", done: true },
-  { label: "Add profile photo", done: false },
-  { label: "Write a bio", done: false },
-];
-
-const profileComplete = Math.round(
-  (profileTasks.filter((t) => t.done).length / profileTasks.length) * 100,
+const Spinner = () => (
+  <div className="flex items-center justify-center h-64">
+    <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
 );
 
 const SeekerDashboard = () => {
-  const { user } = useAuth();
+  const { stats, loading } = useSeekerStats();
+  const { jobs: recommended, loading: jobsLoading } = useRecommendedJobs();
+
+  if (loading) return <Spinner />;
+
+  const { counts, user, recentApps } = stats;
+
+  const statsCards = [
+    {
+      label: "Applied Jobs",
+      value: counts.applied,
+      icon: <FiBriefcase />,
+      bg: "bg-purple-500/10",
+      text: "text-purple-500",
+    },
+    {
+      label: "Under Review",
+      value: counts.underReview,
+      icon: <FiClock />,
+      bg: "bg-yellow-500/10",
+      text: "text-yellow-500",
+    },
+    {
+      label: "Interviews",
+      value: counts.interview,
+      icon: <FiCheckCircle />,
+      bg: "bg-green-500/10",
+      text: "text-green-500",
+    },
+    {
+      label: "Rejected",
+      value: counts.rejected,
+      icon: <FiXCircle />,
+      bg: "bg-red-500/10",
+      text: "text-red-500",
+    },
+  ];
+
+  const profileTasks = [
+    { label: "Add profile photo", done: !!user.profilePhoto },
+    { label: "Add your skills", done: (user.skills || []).length > 0 },
+    {
+      label: "Complete work experience",
+      done: (user.experience || []).length > 0,
+    },
+    { label: "Upload your resume", done: !!user.cvUrl },
+    { label: "Write a bio", done: !!user.bio },
+  ];
+  const profileComplete = Math.round(
+    (profileTasks.filter((t) => t.done).length / profileTasks.length) * 100,
+  );
 
   return (
     <motion.div
@@ -158,14 +102,12 @@ const SeekerDashboard = () => {
       animate="visible"
       className="space-y-6"
     >
-      {/* ===== Welcome Banner ===== */}
+      {/* Welcome Banner */}
       <motion.div
         variants={fadeUp}
         className="relative bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-2xl"></div>
-        <div className="absolute bottom-0 left-1/2 w-40 h-40 bg-white/5 rounded-full translate-y-1/2 blur-xl"></div>
-
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -178,9 +120,9 @@ const SeekerDashboard = () => {
             <p className="text-blue-100 text-sm">
               You have{" "}
               <span className="text-white font-semibold">
-                3 new job recommendations
+                {recommended.length} job recommendations
               </span>{" "}
-              waiting for you.
+              waiting.
             </p>
           </div>
           <Link
@@ -192,12 +134,12 @@ const SeekerDashboard = () => {
         </div>
       </motion.div>
 
-      {/* ===== Stats ===== */}
+      {/* Stats */}
       <motion.div
         variants={stagger}
         className="grid grid-cols-2 lg:grid-cols-4 gap-4"
       >
-        {stats.map((stat, i) => (
+        {statsCards.map((stat, i) => (
           <motion.div
             key={i}
             variants={scaleIn}
@@ -217,17 +159,17 @@ const SeekerDashboard = () => {
         ))}
       </motion.div>
 
-      {/* ===== Main Grid ===== */}
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ===== Recent Applications ===== */}
+        {/* Recent Applications */}
         <motion.div
           variants={fadeUp}
           className="lg:col-span-2 card-theme border rounded-2xl overflow-hidden"
         >
           <div className="flex items-center justify-between px-6 py-4 border-b border-theme">
             <h3 className="font-semibold text-theme-primary flex items-center gap-2">
-              <FiFileText className="text-purple-500 w-4 h-4" />
-              Recent Applications
+              <FiFileText className="text-purple-500 w-4 h-4" /> Recent
+              Applications
             </h3>
             <Link
               to="/seeker/applications"
@@ -237,52 +179,64 @@ const SeekerDashboard = () => {
             </Link>
           </div>
 
-          <div className="divide-y divide-theme">
-            {recentApplications.map((app) => (
-              <div
-                key={app.id}
-                className="flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition"
+          {recentApps.length === 0 ? (
+            <div className="px-6 py-12 text-center">
+              <FiBriefcase className="w-8 h-8 text-theme-muted mx-auto mb-2" />
+              <p className="text-theme-muted text-sm">No applications yet</p>
+              <Link
+                to="/jobs"
+                className="text-purple-500 text-sm mt-2 inline-block hover:text-purple-400"
               >
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-theme rounded-xl flex items-center justify-center flex-shrink-0">
-                  <FiBriefcase className="text-purple-500 w-4 h-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-theme-primary font-medium text-sm truncate">
-                    {app.title}
-                  </p>
-                  <div className="flex items-center gap-2 text-theme-muted text-xs mt-0.5">
-                    <span>{app.company}</span>
-                    <span>·</span>
-                    <FiMapPin className="w-3 h-3" />
-                    <span>{app.location}</span>
+                Browse Jobs →
+              </Link>
+            </div>
+          ) : (
+            <div className="divide-y divide-theme">
+              {recentApps.map((app) => (
+                <div
+                  key={app._id}
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition"
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-theme rounded-xl flex items-center justify-center flex-shrink-0">
+                    <FiBriefcase className="text-purple-500 w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-theme-primary font-medium text-sm truncate">
+                      {app.job?.title}
+                    </p>
+                    <div className="flex items-center gap-2 text-theme-muted text-xs mt-0.5">
+                      <span>{app.job?.company}</span>
+                      <span>·</span>
+                      <FiMapPin className="w-3 h-3" />
+                      <span>{app.job?.location}</span>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span
+                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[app.status] || "bg-gray-500/10 text-gray-500"}`}
+                    >
+                      {app.status}
+                    </span>
+                    <p className="text-theme-muted text-xs mt-1">
+                      {new Date(app.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
-                <div className="text-right flex-shrink-0">
-                  <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${app.statusColor}`}
-                  >
-                    {app.status}
-                  </span>
-                  <p className="text-theme-muted text-xs mt-1">{app.date}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </motion.div>
 
-        {/* ===== Right Column ===== */}
+        {/* Right column */}
         <div className="space-y-6">
-          {/* Profile Complete */}
+          {/* Profile Strength */}
           <motion.div
             variants={fadeUp}
             className="card-theme border rounded-2xl p-5"
           >
             <h3 className="font-semibold text-theme-primary mb-4 flex items-center gap-2">
-              <FiAward className="text-purple-500 w-4 h-4" />
-              Profile Strength
+              <FiAward className="text-purple-500 w-4 h-4" /> Profile Strength
             </h3>
-
-            {/* Circle Progress */}
             <div className="flex items-center gap-4 mb-4">
               <div className="relative w-16 h-16 flex-shrink-0">
                 <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
@@ -300,7 +254,7 @@ const SeekerDashboard = () => {
                     cy="32"
                     r="26"
                     fill="none"
-                    stroke="url(#gradient)"
+                    stroke="url(#grad)"
                     strokeWidth="6"
                     strokeLinecap="round"
                     strokeDasharray={`${2 * Math.PI * 26}`}
@@ -308,13 +262,7 @@ const SeekerDashboard = () => {
                     className="transition-all duration-1000"
                   />
                   <defs>
-                    <linearGradient
-                      id="gradient"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
-                    >
+                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#a855f7" />
                       <stop offset="100%" stopColor="#3b82f6" />
                     </linearGradient>
@@ -326,10 +274,14 @@ const SeekerDashboard = () => {
               </div>
               <div>
                 <p className="text-theme-primary font-medium text-sm">
-                  {profileComplete < 80 ? "Almost there!" : "Looking great!"}
+                  {profileComplete < 60
+                    ? "Needs work!"
+                    : profileComplete < 90
+                      ? "Almost there!"
+                      : "Looking great!"}
                 </p>
                 <p className="text-theme-muted text-xs mt-0.5">
-                  Complete your profile to get more visibility
+                  Complete to get more visibility
                 </p>
               </div>
             </div>
@@ -368,46 +320,45 @@ const SeekerDashboard = () => {
             {profileComplete < 100 && (
               <Link
                 to="/seeker/profile"
-                className="mt-4 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition"
+                className="mt-4 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition"
               >
                 Complete Profile <FiArrowRight className="w-3 h-3" />
               </Link>
             )}
           </motion.div>
 
-          {/* Quick Stats */}
+          {/* Activity */}
           <motion.div
             variants={fadeUp}
             className="card-theme border rounded-2xl p-5"
           >
             <h3 className="font-semibold text-theme-primary mb-4 flex items-center gap-2">
-              <FiTrendingUp className="text-purple-500 w-4 h-4" />
-              Activity
+              <FiTrendingUp className="text-purple-500 w-4 h-4" /> Activity
             </h3>
             <div className="space-y-3">
               {[
                 {
-                  label: "Profile Views",
-                  value: 48,
-                  icon: <FiEye />,
-                  color: "text-blue-500",
-                },
-                {
                   label: "Saved Jobs",
-                  value: 7,
+                  value: counts.savedJobs,
                   icon: <FiBookmark />,
                   color: "text-yellow-500",
                 },
                 {
-                  label: "Job Matches",
-                  value: 23,
+                  label: "Shortlisted",
+                  value: counts.shortlisted,
                   icon: <FiStar />,
                   color: "text-purple-500",
+                },
+                {
+                  label: "Total Applied",
+                  value: counts.applied,
+                  icon: <FiEye />,
+                  color: "text-blue-500",
                 },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className={`${item.color}`}>{item.icon}</span>
+                    <span className={item.color}>{item.icon}</span>
                     <span className="text-theme-secondary text-sm">
                       {item.label}
                     </span>
@@ -422,15 +373,14 @@ const SeekerDashboard = () => {
         </div>
       </div>
 
-      {/* ===== Recommended Jobs ===== */}
+      {/* Recommended Jobs */}
       <motion.div
         variants={fadeUp}
         className="card-theme border rounded-2xl overflow-hidden"
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-theme">
           <h3 className="font-semibold text-theme-primary flex items-center gap-2">
-            <FiStar className="text-purple-500 w-4 h-4" />
-            Recommended For You
+            <FiStar className="text-purple-500 w-4 h-4" /> Recommended For You
           </h3>
           <Link
             to="/seeker/recommended"
@@ -440,47 +390,43 @@ const SeekerDashboard = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-theme">
-          {recommendedJobs.map((job) => (
-            <Link
-              key={job.id}
-              to="/jobs"
-              className="group p-5 hover:bg-black/5 dark:hover:bg-white/5 transition"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-theme rounded-xl flex items-center justify-center">
-                  <FiBriefcase className="text-purple-500 w-4 h-4" />
+        {jobsLoading ? (
+          <div className="p-8 text-center">
+            <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-theme">
+            {recommended.slice(0, 3).map((job) => (
+              <Link
+                key={job._id}
+                to={`/jobs`}
+                className="group p-5 hover:bg-black/5 dark:hover:bg-white/5 transition"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-theme rounded-xl flex items-center justify-center">
+                    <FiBriefcase className="text-purple-500 w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-500/10 text-blue-500">
+                    New
+                  </span>
                 </div>
-                <span
-                  className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                    job.match >= 90
-                      ? "bg-green-500/10 text-green-500"
-                      : job.match >= 80
-                        ? "bg-yellow-500/10 text-yellow-500"
-                        : "bg-blue-500/10 text-blue-500"
-                  }`}
-                >
-                  {job.match}% Match
-                </span>
-              </div>
-
-              <p className="text-theme-primary font-semibold text-sm mb-1 group-hover:text-purple-500 transition">
-                {job.title}
-              </p>
-              <p className="text-theme-muted text-xs mb-2">{job.company}</p>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 text-theme-muted text-xs">
-                  <FiMapPin className="w-3 h-3" />
-                  {job.location}
+                <p className="text-theme-primary font-semibold text-sm mb-1 group-hover:text-purple-500 transition">
+                  {job.title}
+                </p>
+                <p className="text-theme-muted text-xs mb-2">{job.company}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-theme-muted text-xs">
+                    <FiMapPin className="w-3 h-3" /> {job.location}
+                  </div>
+                  <span className="text-purple-500 font-semibold text-xs">
+                    ৳{(job.salaryMin / 1000).toFixed(0)}k-
+                    {(job.salaryMax / 1000).toFixed(0)}k
+                  </span>
                 </div>
-                <span className="text-purple-500 font-semibold text-xs">
-                  {job.salary}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );

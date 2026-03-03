@@ -1,11 +1,6 @@
 import { motion } from "framer-motion";
-import {
-  FiEye,
-  FiTrendingUp,
-  FiUser,
-  FiMapPin,
-  FiBriefcase,
-} from "react-icons/fi";
+import { FiEye, FiTrendingUp, FiBriefcase } from "react-icons/fi";
+import { useSeekerProfile } from "../../hooks/useSeeker";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -13,81 +8,45 @@ const fadeUp = {
 };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
-const viewStats = [
-  {
-    label: "Total Views",
-    value: 248,
-    icon: <FiEye />,
-    color: "from-purple-500 to-purple-700",
-    bg: "bg-purple-500/10",
-    text: "text-purple-500",
-  },
-  {
-    label: "This Week",
-    value: 48,
-    icon: <FiTrendingUp />,
-    color: "from-blue-500 to-blue-700",
-    bg: "bg-blue-500/10",
-    text: "text-blue-500",
-  },
-  {
-    label: "From Employers",
-    value: 31,
-    icon: <FiBriefcase />,
-    color: "from-green-500 to-green-700",
-    bg: "bg-green-500/10",
-    text: "text-green-500",
-  },
-];
-
-const recentViewers = [
-  {
-    id: 1,
-    company: "TechCorp BD",
-    role: "HR Manager",
-    location: "Dhaka",
-    time: "2 hours ago",
-    avatar: "T",
-  },
-  {
-    id: 2,
-    company: "NextGen Tech",
-    role: "Recruiter",
-    location: "Remote",
-    time: "5 hours ago",
-    avatar: "N",
-  },
-  {
-    id: 3,
-    company: "PixelCraft",
-    role: "CTO",
-    location: "Chittagong",
-    time: "1 day ago",
-    avatar: "P",
-  },
-  {
-    id: 4,
-    company: "CloudBase",
-    role: "HR Lead",
-    location: "Dhaka",
-    time: "2 days ago",
-    avatar: "C",
-  },
-  {
-    id: 5,
-    company: "DevHouse",
-    role: "Team Lead",
-    location: "Remote",
-    time: "3 days ago",
-    avatar: "D",
-  },
-];
-
-const weekData = [40, 65, 35, 80, 55, 90, 48];
+// Static for now — profile views tracking needs a separate model
+const weekData = [0, 0, 0, 0, 0, 0, 0];
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const maxVal = Math.max(...weekData);
 
 const ProfileViews = () => {
+  const { profile, loading } = useSeekerProfile();
+
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+
+  const viewStats = [
+    {
+      label: "Total Views",
+      value: 1,
+      icon: <FiEye />,
+      bg: "bg-purple-500/10",
+      text: "text-purple-500",
+    },
+    {
+      label: "This Week",
+      value: weekData.reduce((a, b) => a + b, 0),
+      icon: <FiTrendingUp />,
+      bg: "bg-blue-500/10",
+      text: "text-blue-500",
+    },
+    {
+      label: "Saved Jobs",
+      value: (profile?.savedJobs || []).length,
+      icon: <FiBriefcase />,
+      bg: "bg-green-500/10",
+      text: "text-green-500",
+    },
+  ];
+
   return (
     <motion.div
       variants={stagger}
@@ -98,7 +57,7 @@ const ProfileViews = () => {
       <motion.div variants={fadeUp}>
         <h2 className="text-2xl font-bold text-theme-primary">Profile Views</h2>
         <p className="text-theme-muted text-sm mt-1">
-          See who viewed your profile
+          See how your profile is performing
         </p>
       </motion.div>
 
@@ -143,7 +102,6 @@ const ProfileViews = () => {
                 animate={{ height: `${(val / maxVal) * 100}%` }}
                 transition={{ duration: 0.8, delay: i * 0.1, ease: "easeOut" }}
                 className="w-full bg-gradient-to-t from-purple-600 to-blue-500 rounded-t-lg min-h-2"
-                style={{ maxHeight: "100%" }}
               />
               <span className="text-xs text-theme-muted">{days[i]}</span>
             </div>
@@ -151,42 +109,39 @@ const ProfileViews = () => {
         </div>
       </motion.div>
 
-      {/* Recent Viewers */}
+      {/* Profile completion note */}
       <motion.div
         variants={fadeUp}
-        className="card-theme border rounded-2xl overflow-hidden"
+        className="card-theme border border-purple-500/20 rounded-2xl p-5 bg-purple-500/5"
       >
-        <div className="px-6 py-4 border-b border-theme">
-          <h3 className="font-semibold text-theme-primary">Recent Viewers</h3>
-        </div>
-        <div className="divide-y divide-theme">
-          {recentViewers.map((viewer) => (
-            <div
-              key={viewer.id}
-              className="flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-sm">
-                  {viewer.avatar}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-theme-primary font-medium text-sm">
-                  {viewer.company}
-                </p>
-                <div className="flex items-center gap-2 text-xs text-theme-muted mt-0.5">
-                  <span>{viewer.role}</span>
-                  <span>·</span>
-                  <FiMapPin className="w-3 h-3" />
-                  <span>{viewer.location}</span>
-                </div>
-              </div>
-              <p className="text-theme-muted text-xs flex-shrink-0">
-                {viewer.time}
-              </p>
-            </div>
-          ))}
-        </div>
+        <h3 className="font-semibold text-theme-primary mb-2">
+          🚀 Boost Your Visibility
+        </h3>
+        <ul className="space-y-1.5 text-sm text-theme-secondary">
+          {[
+            !profile?.bio && "Add a bio to your profile",
+            !(profile?.skills || []).length && "Add skills to match more jobs",
+            !profile?.cvUrl && "Upload your CV",
+            !(profile?.experience || []).length && "Add work experience",
+          ]
+            .filter(Boolean)
+            .map((tip, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                {tip}
+              </li>
+            ))}
+          {[
+            profile?.bio,
+            (profile?.skills || []).length,
+            profile?.cvUrl,
+            (profile?.experience || []).length,
+          ].every(Boolean) && (
+            <li className="text-green-500 font-medium">
+              ✅ Profile fully complete!
+            </li>
+          )}
+        </ul>
       </motion.div>
     </motion.div>
   );

@@ -1,13 +1,52 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle } from "react-icons/fi";
+import { motion } from "framer-motion";
+import {
+  FiMail,
+  FiLock,
+  FiEye,
+  FiEyeOff,
+  FiAlertCircle,
+  FiArrowRight,
+} from "react-icons/fi";
+import {
+  FaGoogle,
+  FaBriefcase,
+  FaRocket,
+  FaShieldAlt,
+  FaBrain,
+} from "react-icons/fa";
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
+
+const features = [
+  {
+    icon: <FaBrain />,
+    title: "AI Job Matching",
+    desc: "Smart recommendations based on your skills",
+  },
+  {
+    icon: <FaRocket />,
+    title: "Fast Apply",
+    desc: "One-click apply to thousands of jobs",
+  },
+  {
+    icon: <FaShieldAlt />,
+    title: "Verified Jobs",
+    desc: "All listings are verified and legitimate",
+  },
+];
+
 const Login = () => {
-  const { signInFunc, signInGoogle } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const { signInFunc, signInGoogle, syncUserWithDatabase } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -17,13 +56,22 @@ const Login = () => {
     formState: { errors, isSubmitting },
   } = useForm();
 
+  const getRedirect = (role) => {
+    if (role === "seeker") return "/seeker/dashboard";
+    if (role === "employer") return "/employer/dashboard";
+    if (role === "admin") return "/admin/dashboard";
+    return location?.state || "/";
+  };
+
   const handleLogin = async (data) => {
     try {
-      await signInFunc(data.email, data.password);
-      toast.success("Logged in successfully!");
-      navigate(location?.state || "/");
+      const result = await signInFunc(data.email, data.password);
+      const token = await result.user.getIdToken();
+      const res = await syncUserWithDatabase(result.user);
+      toast.success("Welcome back! 👋");
+      navigate(getRedirect(res?.role || "seeker"));
     } catch (error) {
-      let message = "Something went wrong. Please try again.";
+      let message = "Login failed. Please try again.";
       if (error.code === "auth/user-not-found")
         message = "No account found with this email.";
       else if (error.code === "auth/wrong-password")
@@ -36,92 +84,148 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogle = async () => {
     try {
-      await signInGoogle();
-      toast.success("Logged in with Google!");
+      const result = await signInGoogle();
+      toast.success("Logged in with Google! 🎉");
       navigate(location?.state || "/");
     } catch (error) {
-      toast.error("Google login failed. Try again.");
+      if (error.code !== "auth/popup-closed-by-user") {
+        toast.error("Google login failed. Try again.");
+      }
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-[#0a0a14]">
-      {/* Left Side */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#1a1040] via-[#0f0f2d] to-[#0a0a14] flex-col items-center justify-center px-16 relative overflow-hidden">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-600 opacity-20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-60 h-60 bg-blue-600 opacity-20 rounded-full blur-3xl"></div>
-        <div className="relative z-10 text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-3xl flex items-center justify-center shadow-2xl mx-auto mb-8">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-10 h-10 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <h1 className="text-4xl font-extrabold text-white mb-4">JobPortal</h1>
-          <p className="text-gray-400 text-lg leading-relaxed max-w-sm">
-            Find your dream job or hire the best talent — all in one place.
-          </p>
-          <div className="flex gap-8 mt-12 justify-center">
-            {[
-              { value: "10k+", label: "Jobs Posted" },
-              { value: "5k+", label: "Companies" },
-              { value: "50k+", label: "Job Seekers" },
-            ].map((s, i) => (
-              <div key={i} className="text-center">
-                <p className="text-3xl font-bold text-white">{s.value}</p>
-                <p className="text-gray-400 text-sm mt-1">{s.label}</p>
-              </div>
-            ))}
-          </div>
+    <div className="min-h-screen flex bg-theme-primary">
+      {/* ===== Left Panel ===== */}
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#1a0533] via-[#0f0a2e] to-[#0a0a1f] flex-col justify-between px-16 py-12 relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute top-20 left-10 w-80 h-80 bg-purple-600 opacity-15 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-20 right-10 w-60 h-60 bg-blue-600 opacity-15 rounded-full blur-[80px]"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-900 opacity-10 rounded-full blur-[120px]"></div>
+
+        {/* Decorative Grid */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        ></div>
+
+        {/* Logo */}
+        <div className="relative z-10">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
+              <FaBriefcase className="text-white w-4 h-4" />
+            </div>
+            <span className="text-xl font-bold text-white">
+              Job<span className="text-purple-400">Portal</span>
+            </span>
+          </Link>
         </div>
+
+        {/* Center Content */}
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+          className="relative z-10"
+        >
+          <motion.div variants={fadeUp} className="mb-8">
+            <h2 className="text-5xl font-extrabold text-white leading-tight mb-4">
+              Your Next Career
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                Starts Here
+              </span>
+            </h2>
+            <p className="text-gray-400 text-lg leading-relaxed max-w-sm">
+              Join thousands of professionals who found their dream job through
+              our AI-powered platform.
+            </p>
+          </motion.div>
+
+          <motion.div variants={stagger} className="space-y-4">
+            {features.map((f, i) => (
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-2xl p-4"
+              >
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500/30 to-blue-500/30 rounded-xl flex items-center justify-center text-purple-400 flex-shrink-0">
+                  {f.icon}
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm">{f.title}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{f.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+          className="relative z-10 grid grid-cols-3 gap-4"
+        >
+          {[
+            { value: "50K+", label: "Job Seekers" },
+            { value: "5K+", label: "Companies" },
+            { value: "95%", label: "Success Rate" },
+          ].map((stat, i) => (
+            <motion.div key={i} variants={fadeUp} className="text-center">
+              <p className="text-2xl font-extrabold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                {stat.value}
+              </p>
+              <p className="text-gray-500 text-xs mt-0.5">{stat.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
 
-      {/* Right Side */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
+      {/* ===== Right Panel ===== */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 overflow-y-auto">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+          className="w-full max-w-md"
+        >
           {/* Mobile Logo */}
-          <div className="flex lg:hidden items-center gap-3 mb-10 justify-center">
+          <motion.div
+            variants={fadeUp}
+            className="flex lg:hidden items-center gap-2 mb-8 justify-center"
+          >
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
+              <FaBriefcase className="text-white w-4 h-4" />
             </div>
-            <span className="text-2xl font-bold text-white">JobPortal</span>
-          </div>
+            <span className="text-xl font-bold text-theme-primary">
+              Job<span className="text-purple-500">Portal</span>
+            </span>
+          </motion.div>
 
-          <h2 className="text-3xl font-bold text-white mb-2">Welcome back</h2>
-          <p className="text-gray-400 mb-8">
-            Sign in to your account to continue
-          </p>
+          {/* Heading */}
+          <motion.div variants={fadeUp} className="mb-8">
+            <h1 className="text-3xl font-extrabold text-theme-primary mb-2">
+              Welcome back 👋
+            </h1>
+            <p className="text-theme-muted">
+              Sign in to continue your job search journey
+            </p>
+          </motion.div>
 
           {/* Google Button */}
-          <button
+          <motion.button
+            variants={fadeUp}
             type="button"
-            onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-[#1e1e30] border border-gray-700 text-white py-3 rounded-xl hover:bg-[#252540] hover:border-gray-500 transition mb-6 font-medium"
+            onClick={handleGoogle}
+            className="w-full flex items-center justify-center gap-3 bg-theme-card border border-theme text-theme-primary py-3.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 hover:border-purple-500/30 transition mb-5 font-medium text-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -142,28 +246,38 @@ const Login = () => {
               />
             </svg>
             Continue with Google
-          </button>
+          </motion.button>
 
           {/* Divider */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-gray-700"></div>
-            <span className="text-gray-500 text-sm">
-              Or continue with email
+          <motion.div
+            variants={fadeUp}
+            className="flex items-center gap-4 mb-5"
+          >
+            <div
+              className="flex-1 h-px bg-theme-border"
+              style={{ backgroundColor: "var(--border-color)" }}
+            ></div>
+            <span className="text-theme-muted text-sm">
+              or sign in with email
             </span>
-            <div className="flex-1 h-px bg-gray-700"></div>
-          </div>
+            <div
+              className="flex-1 h-px"
+              style={{ backgroundColor: "var(--border-color)" }}
+            ></div>
+          </motion.div>
 
-          <form onSubmit={handleSubmit(handleLogin)} className="space-y-5">
+          {/* Form */}
+          <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
             {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+            <motion.div variants={fadeUp}>
+              <label className="block text-sm font-medium text-theme-secondary mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
                 <input
                   type="email"
-                  placeholder="topu@example.com"
+                  placeholder="you@example.com"
                   autoComplete="email"
                   {...register("email", {
                     required: "Email is required",
@@ -172,31 +286,31 @@ const Login = () => {
                       message: "Invalid email address",
                     },
                   })}
-                  className={`w-full bg-[#12121f] border rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.email ? "border-red-500" : "border-gray-700"}`}
+                  className={`input-theme w-full border rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.email ? "border-red-500" : ""}`}
                 />
               </div>
               {errors.email && (
-                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
-                  <FiAlertCircle className="w-4 h-4" /> {errors.email.message}
+                <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                  <FiAlertCircle className="w-3 h-3" /> {errors.email.message}
                 </p>
               )}
-            </div>
+            </motion.div>
 
             {/* Password */}
-            <div>
-              <div className="flex justify-between mb-2">
-                <label className="text-sm font-medium text-gray-300">
+            <motion.div variants={fadeUp}>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-theme-secondary">
                   Password
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-purple-400 hover:text-purple-300 transition"
+                  className="text-xs text-purple-500 hover:text-purple-400 transition"
                 >
                   Forgot password?
                 </Link>
               </div>
               <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
@@ -208,12 +322,12 @@ const Login = () => {
                       message: "Password must be at least 6 characters",
                     },
                   })}
-                  className={`w-full bg-[#12121f] border rounded-xl pl-11 pr-12 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.password ? "border-red-500" : "border-gray-700"}`}
+                  className={`input-theme w-full border rounded-xl pl-11 pr-12 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.password ? "border-red-500" : ""}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted hover:text-theme-primary transition"
                 >
                   {showPassword ? (
                     <FiEyeOff className="w-4 h-4" />
@@ -223,22 +337,40 @@ const Login = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
-                  <FiAlertCircle className="w-4 h-4" />{" "}
+                <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                  <FiAlertCircle className="w-3 h-3" />{" "}
                   {errors.password.message}
                 </p>
               )}
-            </div>
+            </motion.div>
 
-            <button
+            {/* Remember Me */}
+            <motion.div
+              variants={fadeUp}
+              className="flex items-center justify-between"
+            >
+              <label className="flex items-center gap-2 cursor-pointer">
+                <div className="relative">
+                  <input type="checkbox" className="sr-only peer" />
+                  <div className="w-4 h-4 border-2 border-gray-400 dark:border-gray-600 rounded peer-checked:bg-purple-500 peer-checked:border-purple-500 transition"></div>
+                </div>
+                <span className="text-sm text-theme-secondary">
+                  Remember me
+                </span>
+              </label>
+            </motion.div>
+
+            {/* Submit */}
+            <motion.button
+              variants={fadeUp}
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 transition shadow-lg shadow-purple-900/30"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3.5 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 transition-all shadow-lg shadow-purple-900/30 text-sm"
             >
               {isSubmitting ? (
                 <>
                   <svg
-                    className="animate-spin h-5 w-5 text-white"
+                    className="animate-spin h-4 w-4 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                   >
@@ -253,37 +385,92 @@ const Login = () => {
                     <path
                       className="opacity-75"
                       fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                     />
                   </svg>
                   Signing in...
                 </>
               ) : (
-                "Sign In"
+                <>
+                  Sign In <FiArrowRight className="w-4 h-4" />
+                </>
               )}
-            </button>
+            </motion.button>
           </form>
 
-          <p className="text-center text-gray-500 mt-8 text-sm">
+          {/* Register Link */}
+          <motion.p
+            variants={fadeUp}
+            className="text-center text-theme-muted text-sm mt-6"
+          >
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-purple-400 font-semibold hover:text-purple-300 transition"
+              state={location.state}
+              className="text-purple-500 font-semibold hover:text-purple-400 transition"
             >
               Create account
             </Link>
-          </p>
-          <p className="text-center text-gray-600 text-xs mt-4">
+          </motion.p>
+
+          {/* Demo Accounts */}
+          <motion.div
+            variants={fadeUp}
+            className="mt-6 p-4 bg-theme-card border border-theme rounded-2xl"
+          >
+            <p className="text-theme-muted text-xs font-medium mb-3 text-center">
+              🧪 Demo Accounts
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                {
+                  role: "Seeker",
+                  email: "seeker@demo.com",
+                  color: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+                },
+                {
+                  role: "Employer",
+                  email: "employer@demo.com",
+                  color:
+                    "text-purple-500 bg-purple-500/10 border-purple-500/20",
+                },
+                {
+                  role: "Admin",
+                  email: "admin@demo.com",
+                  color: "text-red-500 bg-red-500/10 border-red-500/20",
+                },
+              ].map((demo) => (
+                <div
+                  key={demo.role}
+                  className={`text-center border rounded-xl p-2.5 ${demo.color}`}
+                >
+                  <p className="text-xs font-semibold">{demo.role}</p>
+                  <p className="text-xs opacity-70 truncate mt-0.5">
+                    {demo.email}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="text-theme-muted text-xs text-center mt-2 opacity-60">
+              Password: demo123
+            </p>
+          </motion.div>
+
+          {/* Terms */}
+          <motion.p
+            variants={fadeUp}
+            className="text-center text-theme-muted text-xs mt-4"
+          >
             By signing in, you agree to our{" "}
-            <span className="text-gray-500 hover:text-white cursor-pointer transition">
+            <span className="text-purple-500 cursor-pointer hover:text-purple-400 transition">
               Terms of Service
             </span>{" "}
             and{" "}
-            <span className="text-gray-500 hover:text-white cursor-pointer transition">
+            <span className="text-purple-500 cursor-pointer hover:text-purple-400 transition">
               Privacy Policy
             </span>
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );

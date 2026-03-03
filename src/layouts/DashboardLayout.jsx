@@ -50,7 +50,7 @@ const sidebarLinks = {
     { label: "Dashboard", path: "/employer/dashboard", icon: <FiHome /> },
     { label: "Profile", path: "/employer/profile", icon: <FiUser /> },
     { label: "Post a Job", path: "/employer/post-job", icon: <FiPlusCircle /> },
-    { label: "My Jobs", path: "/employer/jobs", icon: <FiBriefcase /> },
+    { label: "My Jobs", path: "/employer/jobs", icon: <FaBriefcase /> },
     { label: "Applicants", path: "/employer/applicants", icon: <FiUsers /> },
     {
       label: "Messages",
@@ -80,10 +80,6 @@ const sidebarLinks = {
   ],
 };
 
-function FiBriefcase(props) {
-  return <FaBriefcase {...props} />;
-}
-
 const DashboardLayout = ({ role }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logOut } = useAuth();
@@ -91,7 +87,6 @@ const DashboardLayout = ({ role }) => {
   const location = useLocation();
 
   const links = sidebarLinks[role] || [];
-
   const profileComplete = 98;
 
   const handleLogout = async () => {
@@ -107,7 +102,7 @@ const DashboardLayout = ({ role }) => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-theme">
+      <div className="px-5 py-4 border-b border-theme flex-shrink-0">
         <Link to="/" className="flex items-center gap-2">
           <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
             <FaBriefcase className="text-white w-4 h-4" />
@@ -119,7 +114,7 @@ const DashboardLayout = ({ role }) => {
       </div>
 
       {/* User Info */}
-      <div className="px-5 py-5 border-b border-theme">
+      <div className="px-5 py-5 border-b border-theme flex-shrink-0">
         <div className="flex items-center gap-3 mb-3">
           {user?.photoURL ? (
             <img
@@ -128,8 +123,8 @@ const DashboardLayout = ({ role }) => {
               className="w-12 h-12 rounded-full object-cover border-2 border-purple-500"
             />
           ) : (
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-bold text-lg leading-none">
                 {user?.name?.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -173,7 +168,9 @@ const DashboardLayout = ({ role }) => {
                   : "text-theme-secondary hover:text-theme-primary hover:bg-black/5 dark:hover:bg-white/5"
               }`}
             >
-              <span className="w-4 h-4 flex-shrink-0">{link.icon}</span>
+              <span className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+                {link.icon}
+              </span>
               {link.label}
             </Link>
           );
@@ -181,7 +178,7 @@ const DashboardLayout = ({ role }) => {
       </nav>
 
       {/* Logout */}
-      <div className="px-3 py-4 border-t border-theme">
+      <div className="px-3 py-4 border-t border-theme flex-shrink-0">
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-500/10 transition-all duration-200"
@@ -236,8 +233,8 @@ const DashboardLayout = ({ role }) => {
 
       {/* ===== Main Content ===== */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar (mobile only) */}
-        <header className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-theme bg-theme-secondary">
+        {/* Mobile Top Bar */}
+        <header className="lg:hidden flex items-center justify-between px-6 h-16 border-b border-theme bg-theme-secondary flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(true)}
             className="w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary"
@@ -254,7 +251,7 @@ const DashboardLayout = ({ role }) => {
             </span>
           </Link>
 
-          <div className="w-9 h-9 flex items-center justify-center">
+          <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
             {user?.photoURL ? (
               <img
                 src={user.photoURL}
@@ -263,7 +260,7 @@ const DashboardLayout = ({ role }) => {
               />
             ) : (
               <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold">
+                <span className="text-white text-sm font-bold leading-none">
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
@@ -272,19 +269,19 @@ const DashboardLayout = ({ role }) => {
         </header>
 
         {/* Desktop Top Header */}
-        <header className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-theme bg-theme-secondary">
-          <h1 className="text-xl font-bold text-theme-primary">
+        <header className="hidden lg:flex items-center justify-between px-8 py-4  border-b border-theme bg-theme-secondary flex-shrink-0">
+          <h1 className="text-xl font-bold text-theme-primary leading-none">
             {links.find((item) => location.pathname === item.path)?.label ||
               "Dashboard"}
           </h1>
           <div className="flex items-center gap-3">
             {/* Notification Bell */}
-            <button className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary transition">
+            <button className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary transition flex-shrink-0">
               <FiBell className="w-4 h-4" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             {/* Settings */}
-            <button className="w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary transition">
+            <button className="w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary transition flex-shrink-0">
               <FiSettings className="w-4 h-4" />
             </button>
             {/* Avatar */}
@@ -292,18 +289,17 @@ const DashboardLayout = ({ role }) => {
               <img
                 src={user.photoURL}
                 alt=""
-                className="w-9 h-9 rounded-xl object-cover border-2 border-purple-500"
+                className="w-9 h-9 rounded-xl object-cover border-2 border-purple-500 flex-shrink-0"
               />
             ) : (
-              <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
-                <span className="text-white text-sm font-bold">
+              <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-sm font-bold leading-none">
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
             )}
           </div>
         </header>
-
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto p-6">
           <Outlet />
