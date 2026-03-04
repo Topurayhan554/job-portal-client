@@ -1,152 +1,99 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   FiBriefcase,
   FiUsers,
-  FiEye,
   FiTrendingUp,
+  FiAward,
   FiArrowRight,
   FiMapPin,
   FiClock,
-  FiPlus,
   FiCheckCircle,
-  FiXCircle,
-  FiAlertCircle,
+  FiPlusCircle,
+  FiEye,
 } from "react-icons/fi";
 import { FaRocket } from "react-icons/fa";
+import { useApplicants } from "../../hooks/useEmployer";
 import useAuth from "../../hooks/useAuth";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
-const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
+const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 const scaleIn = {
   hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
+  visible: { opacity: 1, scale: 1 },
 };
 
-const stats = [
-  {
-    label: "Active Jobs",
-    value: 8,
-    icon: <FiBriefcase />,
-    bg: "bg-purple-500/10",
-    text: "text-purple-500",
-  },
-  {
-    label: "Total Applicants",
-    value: 142,
-    icon: <FiUsers />,
-    bg: "bg-blue-500/10",
-    text: "text-blue-500",
-  },
-  {
-    label: "Profile Views",
-    value: 1240,
-    icon: <FiEye />,
-    bg: "bg-green-500/10",
-    text: "text-green-500",
-  },
-  {
-    label: "Hired This Month",
-    value: 5,
-    icon: <FiTrendingUp />,
-    bg: "bg-yellow-500/10",
-    text: "text-yellow-500",
-  },
-];
-
-const recentJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    location: "Dhaka",
-    type: "Full-time",
-    applicants: 24,
-    status: "Active",
-    posted: "2 days ago",
-  },
-  {
-    id: 2,
-    title: "UI/UX Designer",
-    location: "Remote",
-    type: "Part-time",
-    applicants: 18,
-    status: "Active",
-    posted: "5 days ago",
-  },
-  {
-    id: 3,
-    title: "Backend Engineer",
-    location: "Chittagong",
-    type: "Full-time",
-    applicants: 31,
-    status: "Paused",
-    posted: "1 week ago",
-  },
-  {
-    id: 4,
-    title: "Product Manager",
-    location: "Dhaka",
-    type: "Full-time",
-    applicants: 12,
-    status: "Closed",
-    posted: "2 weeks ago",
-  },
-];
-
-const recentApplicants = [
-  {
-    id: 1,
-    name: "Rahim Uddin",
-    role: "Frontend Developer",
-    match: 92,
-    status: "Shortlisted",
-    avatar: "R",
-    time: "2 hours ago",
-  },
-  {
-    id: 2,
-    name: "Sadia Islam",
-    role: "UI/UX Designer",
-    match: 88,
-    status: "Under Review",
-    avatar: "S",
-    time: "5 hours ago",
-  },
-  {
-    id: 3,
-    name: "Karim Hossain",
-    role: "Backend Engineer",
-    match: 75,
-    status: "Applied",
-    avatar: "K",
-    time: "1 day ago",
-  },
-  {
-    id: 4,
-    name: "Nusrat Jahan",
-    role: "Frontend Developer",
-    match: 85,
-    status: "Interview",
-    avatar: "N",
-    time: "2 days ago",
-  },
-];
-
-const statusConfig = {
-  Active: "bg-green-500/10 text-green-500",
-  Paused: "bg-yellow-500/10 text-yellow-500",
-  Closed: "bg-red-500/10 text-red-500",
-  Shortlisted: "bg-purple-500/10 text-purple-500",
-  "Under Review": "bg-yellow-500/10 text-yellow-500",
-  Applied: "bg-blue-500/10 text-blue-500",
-  Interview: "bg-green-500/10 text-green-500",
+const statusColor = {
+  Interview: "text-green-500 bg-green-500/10",
+  "Under Review": "text-yellow-500 bg-yellow-500/10",
+  Rejected: "text-red-500 bg-red-500/10",
+  Applied: "text-blue-500 bg-blue-500/10",
+  Shortlisted: "text-purple-500 bg-purple-500/10",
+  Hired: "text-emerald-500 bg-emerald-500/10",
 };
+
+const avatarColors = [
+  "from-purple-500 to-blue-500",
+  "from-pink-500 to-rose-500",
+  "from-green-500 to-teal-500",
+  "from-orange-500 to-yellow-500",
+];
+
+const Spinner = () => (
+  <div className="flex items-center justify-center h-64">
+    <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 const EmployerDashboard = () => {
+  const { fetchStats } = useApplicants();
   const { user } = useAuth();
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats().then((s) => {
+      setStats(s);
+      setLoading(false);
+    });
+  }, [fetchStats]);
+
+  if (loading) return <Spinner />;
+
+  const statCards = [
+    {
+      label: "Total Jobs",
+      value: stats?.totalJobs || 0,
+      icon: <FiBriefcase />,
+      bg: "bg-purple-500/10",
+      text: "text-purple-500",
+    },
+    {
+      label: "Active Jobs",
+      value: stats?.activeJobs || 0,
+      icon: <FiTrendingUp />,
+      bg: "bg-green-500/10",
+      text: "text-green-500",
+    },
+    {
+      label: "Total Applicants",
+      value: stats?.totalApplicants || 0,
+      icon: <FiUsers />,
+      bg: "bg-blue-500/10",
+      text: "text-blue-500",
+    },
+    {
+      label: "Hired",
+      value: stats?.hired || 0,
+      icon: <FiAward />,
+      bg: "bg-yellow-500/10",
+      text: "text-yellow-500",
+    },
+  ];
 
   return (
     <motion.div
@@ -160,29 +107,36 @@ const EmployerDashboard = () => {
         variants={fadeUp}
         className="relative bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-2xl"></div>
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, #fff 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl" />
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <FaRocket className="text-yellow-300 w-4 h-4" />
-              <span className="text-blue-100 text-sm">Employer Dashboard</span>
+              <span className="text-blue-100 text-sm">Employer Panel</span>
             </div>
             <h2 className="text-2xl font-bold text-white mb-1">
-              Welcome back, {user?.name?.split(" ")[0]} 👋
+              Welcome, {user?.name?.split(" ")[0]} 👋
             </h2>
             <p className="text-blue-100 text-sm">
-              You have{" "}
               <span className="text-white font-semibold">
-                12 new applicants
+                {stats?.totalApplicants || 0} applicants
               </span>{" "}
-              since your last visit.
+              are waiting for your review.
             </p>
           </div>
           <Link
             to="/employer/post-job"
             className="flex-shrink-0 flex items-center gap-2 bg-white text-purple-600 font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-50 transition text-sm shadow-lg"
           >
-            <FiPlus className="w-4 h-4" /> Post a Job
+            <FiPlusCircle className="w-4 h-4" /> Post a Job
           </Link>
         </div>
       </motion.div>
@@ -192,7 +146,7 @@ const EmployerDashboard = () => {
         variants={stagger}
         className="grid grid-cols-2 lg:grid-cols-4 gap-4"
       >
-        {stats.map((stat, i) => (
+        {statCards.map((stat, i) => (
           <motion.div
             key={i}
             variants={scaleIn}
@@ -212,62 +166,11 @@ const EmployerDashboard = () => {
         ))}
       </motion.div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Jobs */}
-        <motion.div
-          variants={fadeUp}
-          className="card-theme border rounded-2xl overflow-hidden"
-        >
-          <div className="flex items-center justify-between px-6 py-4 border-b border-theme">
-            <h3 className="font-semibold text-theme-primary flex items-center gap-2">
-              <FiBriefcase className="text-purple-500 w-4 h-4" /> Active Jobs
-            </h3>
-            <Link
-              to="/employer/jobs"
-              className="text-purple-500 hover:text-purple-400 text-sm flex items-center gap-1"
-            >
-              View all <FiArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-          <div className="divide-y divide-theme">
-            {recentJobs.map((job) => (
-              <div
-                key={job.id}
-                className="flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition"
-              >
-                <div className="w-10 h-10 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <FiBriefcase className="text-purple-500 w-4 h-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-theme-primary font-medium text-sm">
-                    {job.title}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-theme-muted mt-0.5">
-                    <FiMapPin className="w-3 h-3" />
-                    {job.location}
-                    <span>·</span>
-                    <FiClock className="w-3 h-3" />
-                    {job.type}
-                    <span>·</span>
-                    <FiUsers className="w-3 h-3" />
-                    {job.applicants} applicants
-                  </div>
-                </div>
-                <span
-                  className={`text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0 ${statusConfig[job.status]}`}
-                >
-                  {job.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Applicants */}
         <motion.div
           variants={fadeUp}
-          className="card-theme border rounded-2xl overflow-hidden"
+          className="lg:col-span-2 card-theme border rounded-2xl overflow-hidden"
         >
           <div className="flex items-center justify-between px-6 py-4 border-b border-theme">
             <h3 className="font-semibold text-theme-primary flex items-center gap-2">
@@ -280,89 +183,184 @@ const EmployerDashboard = () => {
               View all <FiArrowRight className="w-3 h-3" />
             </Link>
           </div>
-          <div className="divide-y divide-theme">
-            {recentApplicants.map((app) => (
-              <div
-                key={app.id}
-                className="flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition"
-              >
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-sm">
-                    {app.avatar}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-theme-primary font-medium text-sm">
-                    {app.name}
-                  </p>
-                  <p className="text-theme-muted text-xs mt-0.5">
-                    {app.role} · {app.time}
-                  </p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusConfig[app.status]}`}
-                  >
-                    {app.status}
-                  </span>
-                  <p className="text-xs text-theme-muted mt-1">
-                    {app.match}% match
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
 
-      {/* Quick Actions */}
-      <motion.div
-        variants={fadeUp}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
-      >
-        {[
-          {
-            label: "Post New Job",
-            desc: "Create a new job listing",
-            icon: <FiPlus />,
-            to: "/employer/post-job",
-            color: "from-purple-600 to-blue-600",
-          },
-          {
-            label: "View Applicants",
-            desc: "Review all applications",
-            icon: <FiUsers />,
-            to: "/employer/applicants",
-            color: "from-blue-600 to-cyan-600",
-          },
-          {
-            label: "Manage Jobs",
-            desc: "Edit or close listings",
-            icon: <FiBriefcase />,
-            to: "/employer/jobs",
-            color: "from-green-600 to-teal-600",
-          },
-        ].map((action, i) => (
-          <Link
-            key={i}
-            to={action.to}
-            className="group card-theme border hover:border-purple-500/30 rounded-2xl p-5 flex items-center gap-4 transition hover:bg-purple-500/5"
+          {(stats?.recentApps || []).length === 0 ? (
+            <div className="px-6 py-12 text-center">
+              <FiUsers className="w-8 h-8 text-theme-muted mx-auto mb-2" />
+              <p className="text-theme-muted text-sm">No applicants yet</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-theme">
+              {stats.recentApps.map((app, i) => (
+                <div
+                  key={app._id}
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition"
+                >
+                  {app.applicant?.profilePhoto || app.applicant?.photoURL ? (
+                    <img
+                      src={app.applicant.profilePhoto || app.applicant.photoURL}
+                      alt=""
+                      className="w-10 h-10 rounded-xl object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div
+                      className={`w-10 h-10 bg-gradient-to-br ${avatarColors[i % 4]} rounded-xl flex items-center justify-center flex-shrink-0`}
+                    >
+                      <span className="text-white text-sm font-bold">
+                        {app.applicant?.name?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-theme-primary font-semibold text-sm truncate">
+                      {app.applicant?.name}
+                    </p>
+                    <p className="text-theme-muted text-xs truncate">
+                      Applied for:{" "}
+                      <span className="text-theme-secondary">
+                        {app.job?.title}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span
+                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[app.status] || "bg-gray-500/10 text-gray-500"}`}
+                    >
+                      {app.status}
+                    </span>
+                    <p className="text-theme-muted text-xs mt-1">
+                      {new Date(app.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        {/* Right Column */}
+        <div className="space-y-5">
+          {/* Pipeline */}
+          <motion.div
+            variants={fadeUp}
+            className="card-theme border rounded-2xl p-5"
           >
-            <div
-              className={`w-12 h-12 bg-gradient-to-br ${action.color} rounded-xl flex items-center justify-center text-white flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}
-            >
-              {action.icon}
+            <h3 className="font-semibold text-theme-primary mb-4 flex items-center gap-2">
+              <FiCheckCircle className="text-purple-500 w-4 h-4" /> Hiring
+              Pipeline
+            </h3>
+            <div className="space-y-3">
+              {[
+                {
+                  label: "Applied",
+                  value: stats?.totalApplicants || 0,
+                  color: "bg-blue-500",
+                },
+                {
+                  label: "Shortlisted",
+                  value: stats?.shortlisted || 0,
+                  color: "bg-purple-500",
+                },
+                {
+                  label: "Interviewed",
+                  value: stats?.interviewed || 0,
+                  color: "bg-yellow-500",
+                },
+                {
+                  label: "Hired",
+                  value: stats?.hired || 0,
+                  color: "bg-green-500",
+                },
+              ].map((item, i) => (
+                <div key={i}>
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-theme-secondary">{item.label}</span>
+                    <span className="text-theme-primary font-semibold">
+                      {item.value}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-theme-primary rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: stats?.totalApplicants
+                          ? `${(item.value / stats.totalApplicants) * 100}%`
+                          : "0%",
+                      }}
+                      transition={{
+                        duration: 1,
+                        delay: i * 0.1,
+                        ease: "easeOut",
+                      }}
+                      className={`h-full ${item.color} rounded-full`}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-            <div>
-              <p className="text-theme-primary font-semibold text-sm">
-                {action.label}
+          </motion.div>
+
+          {/* Recent Jobs */}
+          <motion.div
+            variants={fadeUp}
+            className="card-theme border rounded-2xl p-5"
+          >
+            <h3 className="font-semibold text-theme-primary mb-4 flex items-center gap-2">
+              <FiBriefcase className="text-purple-500 w-4 h-4" /> My Jobs
+            </h3>
+            {(stats?.recentJobs || []).length === 0 ? (
+              <p className="text-theme-muted text-sm text-center py-4">
+                No jobs posted yet
               </p>
-              <p className="text-theme-muted text-xs mt-0.5">{action.desc}</p>
-            </div>
-            <FiArrowRight className="w-4 h-4 text-theme-muted ml-auto group-hover:text-purple-500 group-hover:translate-x-1 transition-all" />
-          </Link>
-        ))}
-      </motion.div>
+            ) : (
+              <div className="space-y-3">
+                {stats.recentJobs.map((job) => (
+                  <div
+                    key={job._id}
+                    className="flex items-start gap-3 p-3 bg-theme-primary/30 rounded-xl border border-theme hover:border-purple-500/20 transition"
+                  >
+                    <div className="w-8 h-8 bg-purple-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <FiBriefcase className="text-purple-500 w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-theme-primary font-medium text-xs truncate">
+                        {job.title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="flex items-center gap-0.5 text-theme-muted text-xs">
+                          <FiMapPin className="w-2.5 h-2.5" />
+                          {job.location}
+                        </span>
+                        <span
+                          className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                            job.status === "Active"
+                              ? "text-green-500 bg-green-500/10"
+                              : job.status === "Paused"
+                                ? "text-yellow-500 bg-yellow-500/10"
+                                : "text-red-500 bg-red-500/10"
+                          }`}
+                        >
+                          {job.status}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-theme-muted flex-shrink-0">
+                      <FiEye className="w-3 h-3" />
+                      {job.applicantsCount || 0}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Link
+              to="/employer/jobs"
+              className="mt-3 flex items-center justify-center gap-1 text-purple-500 text-xs hover:text-purple-400 transition"
+            >
+              View all jobs <FiArrowRight className="w-3 h-3" />
+            </Link>
+          </motion.div>
+        </div>
+      </div>
     </motion.div>
   );
 };

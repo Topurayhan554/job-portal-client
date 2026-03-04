@@ -28,22 +28,20 @@ import ManageJobs from "../pages/admin/ManageJobs";
 import AdminApplications from "../pages/admin/AdminApplications";
 import { AiFillSecurityScan } from "react-icons/ai";
 import Security from "../pages/admin/Security";
+import AdminProfile from "../pages/admin/AdminProfile";
+import JobDetails from "../pages/Job/JobsDetails";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayouts />,
     children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "/jobs",
-        element: <Jobs />,
-      },
+      { index: true, element: <Home /> },
+      { path: "/jobs", element: <Jobs /> },
+      { path: "/jobs/:id", element: <JobDetails /> },
     ],
   },
+  // auth
   {
     path: "/",
     element: <AuthLayouts />,
@@ -118,7 +116,7 @@ export const router = createBrowserRouter([
       { path: "post-job", element: <PostJob /> },
       { path: "jobs", element: <MyJobs /> },
       { path: "applicants", element: <Applicants /> },
-      // ✅ Shared  
+      // Shared
       { path: "messages", element: <Messages /> },
       { path: "notifications", element: <Notifications /> },
       { path: "settings", element: <Settings /> },
@@ -135,11 +133,13 @@ export const router = createBrowserRouter([
     ),
     children: [
       { path: "dashboard", element: <AdminDashboard /> },
+      { path: "profile", element: <AdminProfile /> },
+
       { path: "users", element: <ManageUsers /> },
       { path: "jobs", element: <ManageJobs /> },
       { path: "applications", element: <AdminApplications /> },
       { path: "security", element: <Security /> },
-      // ✅ Shared
+      // Shared
       { path: "messages", element: <Messages /> },
       { path: "notifications", element: <Notifications /> },
       { path: "settings", element: <Settings /> },

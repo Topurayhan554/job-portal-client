@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaBriefcase, FaBars, FaTimes } from "react-icons/fa";
+import { FaBriefcase, FaBars } from "react-icons/fa";
 import {
   FiHome,
   FiUser,
@@ -22,8 +22,10 @@ import {
   FiShield,
 } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
+import useNotifications from "../hooks/useNotifications";
 import toast from "react-hot-toast";
 
+// ===== Sidebar Links =====
 const sidebarLinks = {
   seeker: [
     { label: "Dashboard", path: "/seeker/dashboard", icon: <FiHome /> },
@@ -36,11 +38,7 @@ const sidebarLinks = {
     },
     { label: "Find Jobs", path: "/jobs", icon: <FiSearch /> },
     { label: "Saved Jobs", path: "/seeker/saved", icon: <FiBookmark /> },
-    {
-      label: "Recommended Jobs",
-      path: "/seeker/recommended",
-      icon: <FiStar />,
-    },
+    { label: "Recommended", path: "/seeker/recommended", icon: <FiStar /> },
     { label: "CV Manager", path: "/seeker/cv", icon: <FiFile /> },
     { label: "Profile Views", path: "/seeker/views", icon: <FiEye /> },
     { label: "Notifications", path: "/seeker/notifications", icon: <FiBell /> },
@@ -66,6 +64,7 @@ const sidebarLinks = {
   ],
   admin: [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiGrid /> },
+    { label: "Profile", path: "/admin/profile", icon: <FiUser /> },
     { label: "Manage Users", path: "/admin/users", icon: <FiUsers /> },
     { label: "Manage Jobs", path: "/admin/jobs", icon: <FiClipboard /> },
     {
@@ -80,14 +79,69 @@ const sidebarLinks = {
   ],
 };
 
+// ===== Profile Completion =====
+const calcProfileComplete = (user) => {
+  if (!user) return 0;
+  const checks = [
+    !!user.profilePhoto,
+    !!user.phone,
+    !!user.bio,
+    !!user.location,
+  ];
+  if (user.role === "seeker") {
+    checks.push(
+      (user.skills || []).length > 0,
+      (user.experience || []).length > 0,
+      (user.education || []).length > 0,
+      !!user.cvUrl,
+    );
+  } else if (user.role === "employer") {
+    checks.push(!!user.companyName, !!user.companyWebsite, !!user.companyBio);
+  } else if (user.role === "admin") {
+    checks.push(!!user.name);
+  }
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+};
+
+const getNotifPath = (role) => `/${role}/notifications`;
+const getSettingsPath = (role) => `/${role}/settings`;
+
+// ===== Avatar =====
+const Avatar = ({ user, size = "sm", className = "" }) => {
+  const photo = user?.profilePhoto || user?.photoURL;
+  const dims = size === "sm" ? "w-9 h-9" : "w-12 h-12";
+  const text = size === "sm" ? "text-sm" : "text-lg";
+  const rounded = size === "sm" ? "rounded-xl" : "rounded-full";
+
+  return photo ? (
+    <img
+      src={photo}
+      alt={user?.name}
+      className={`${dims} ${rounded} object-cover flex-shrink-0 ${className}`}
+    />
+  ) : (
+    <div
+      className={`${dims} bg-gradient-to-br from-purple-500 to-blue-500 ${rounded} flex items-center justify-center flex-shrink-0 ${className}`}
+    >
+      <span className={`text-white font-bold ${text} leading-none`}>
+        {user?.name?.charAt(0).toUpperCase()}
+      </span>
+    </div>
+  );
+};
+
+// ===== Main Component =====
 const DashboardLayout = ({ role }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Real notification count
+  const { unreadCount } = useNotifications();
+
   const links = sidebarLinks[role] || [];
-  const profileComplete = 98;
+  const profileComplete = calcProfileComplete(user);
 
   const handleLogout = async () => {
     try {
@@ -99,115 +153,131 @@ const DashboardLayout = ({ role }) => {
     }
   };
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-5 py-4 border-b border-theme flex-shrink-0">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
-            <FaBriefcase className="text-white w-4 h-4" />
-          </div>
-          <span className="text-lg font-bold text-theme-primary">
-            Job<span className="text-purple-500">Portal</span>
-          </span>
-        </Link>
-      </div>
-
-      {/* User Info */}
-      <div className="px-5 py-5 border-b border-theme flex-shrink-0">
-        <div className="flex items-center gap-3 mb-3">
-          {user?.photoURL ? (
-            <img
-              src={user.photoURL}
-              alt={user.name}
-              className="w-12 h-12 rounded-full object-cover border-2 border-purple-500"
-            />
-          ) : (
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-lg leading-none">
-                {user?.name?.charAt(0).toUpperCase()}
-              </span>
+  // ===== Sidebar Content =====
+  const SidebarContent = useCallback(
+    () => (
+      <div className="flex flex-col h-full">
+        {/* Logo */}
+        <div className="px-5 py-4 border-b border-theme flex-shrink-0">
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <FaBriefcase className="text-white w-4 h-4" />
             </div>
-          )}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1">
+            <span className="text-lg font-bold text-theme-primary">
+              Job<span className="text-purple-500">Portal</span>
+            </span>
+          </Link>
+        </div>
+
+        {/* User Info */}
+        <div className="px-5 py-4 border-b border-theme flex-shrink-0">
+          <div className="flex items-center gap-3 mb-3">
+            <Avatar user={user} size="lg" />
+            <div className="flex-1 min-w-0">
               <p className="text-theme-primary font-semibold text-sm truncate">
                 {user?.name}
               </p>
-              <span className="text-purple-500 text-xs">✎</span>
+              <p className="text-theme-muted text-xs capitalize mt-0.5">
+                {user?.role}
+              </p>
             </div>
           </div>
+
+          {/* Profile Complete Bar */}
+          <Link
+            to={`/${role}/profile`}
+            className="block bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl px-3 py-2 hover:opacity-90 transition"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-white text-xs font-semibold">
+                Profile Complete
+              </p>
+              <p className="text-white text-xs font-bold">{profileComplete}%</p>
+            </div>
+            <div className="w-full h-1.5 bg-white/30 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${profileComplete}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="h-full bg-white rounded-full"
+              />
+            </div>
+            {profileComplete < 100 && (
+              <p className="text-blue-100 text-xs mt-1">
+                {100 - profileComplete}% left — complete now →
+              </p>
+            )}
+          </Link>
         </div>
 
-        {/* Profile Complete Bar */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl px-3 py-2">
-          <p className="text-white text-xs font-semibold mb-1">
-            {profileComplete}% Profile Complete
+        {/* Nav Links */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+          {links.map((link) => {
+            const isActive = location.pathname === link.path;
+            const isNotif = link.path.includes("notifications");
+
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={() => setSidebarOpen(false)}
+                className={`relative flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-900/20"
+                    : "text-theme-secondary hover:text-theme-primary hover:bg-black/5 dark:hover:bg-white/5"
+                }`}
+              >
+                <span className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+                  {link.icon}
+                </span>
+                {link.label}
+
+                {/* Real unread badge in sidebar */}
+                {isNotif && unreadCount > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Logout + Footer */}
+        <div className="px-3 py-4 border-t border-theme flex-shrink-0">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-500/10 transition-all duration-200"
+          >
+            <FiLogOut className="w-4 h-4" /> Sign Out
+          </button>
+          <p className="text-theme-muted text-xs text-center mt-3 leading-relaxed">
+            © {new Date().getFullYear()} JobPortal. All rights reserved. <br />
+            <span className="hover:text-purple-500 cursor-pointer transition">
+              Privacy
+            </span>
+            {" · "}
+            <span className="hover:text-purple-500 cursor-pointer transition">
+              Terms
+            </span>
           </p>
-          <div className="w-full h-1.5 bg-white/30 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-white rounded-full transition-all duration-500"
-              style={{ width: `${profileComplete}%` }}
-            />
-          </div>
         </div>
       </div>
-
-      {/* Nav Links */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        {links.map((link) => {
-          const isActive = location.pathname === link.path;
-          return (
-            <Link
-              key={link.path}
-              to={link.path}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                isActive
-                  ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-900/30"
-                  : "text-theme-secondary hover:text-theme-primary hover:bg-black/5 dark:hover:bg-white/5"
-              }`}
-            >
-              <span className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                {link.icon}
-              </span>
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-theme flex-shrink-0">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-500/10 transition-all duration-200"
-        >
-          <FiLogOut className="w-4 h-4" />
-          Sign Out
-        </button>
-        <p className="text-theme-muted text-xs text-center mt-4">
-          © {new Date().getFullYear()} qIS Lab. All Rights Reserved <br />
-          <span className="hover:text-purple-500 cursor-pointer">
-            Privacy Policy
-          </span>
-          {" · "}
-          <span className="hover:text-purple-500 cursor-pointer">
-            Terms of Service
-          </span>
-        </p>
-      </div>
-    </div>
+    ),
+    [user, location.pathname, profileComplete, unreadCount],
   );
+
+  const pageTitle =
+    links.find((item) => location.pathname === item.path)?.label || "Dashboard";
 
   return (
     <div className="flex h-screen bg-theme-primary overflow-hidden">
-      {/* ===== Desktop Sidebar ===== */}
+      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-theme-secondary border-r border-theme flex-shrink-0">
         <SidebarContent />
       </aside>
 
-      {/* ===== Mobile Sidebar Overlay ===== */}
+      {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -215,7 +285,7 @@ const DashboardLayout = ({ role }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
               onClick={() => setSidebarOpen(false)}
             />
             <motion.aside
@@ -231,13 +301,13 @@ const DashboardLayout = ({ role }) => {
         )}
       </AnimatePresence>
 
-      {/* ===== Main Content ===== */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile Top Bar */}
-        <header className="lg:hidden flex items-center justify-between px-6 h-16 border-b border-theme bg-theme-secondary flex-shrink-0">
+        <header className="lg:hidden flex items-center justify-between px-4 h-16 border-b border-theme bg-theme-secondary flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary"
+            className="w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary transition"
           >
             <FaBars className="w-4 h-4" />
           </button>
@@ -246,60 +316,95 @@ const DashboardLayout = ({ role }) => {
             <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
               <FaBriefcase className="text-white w-3 h-3" />
             </div>
-            <span className="font-bold text-theme-primary">
+            <span className="font-bold text-theme-primary text-sm">
               Job<span className="text-purple-500">Portal</span>
             </span>
           </Link>
 
-          <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
-            {user?.photoURL ? (
-              <img
-                src={user.photoURL}
-                alt=""
-                className="w-9 h-9 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold leading-none">
-                  {user?.name?.charAt(0).toUpperCase()}
+          <div className="flex items-center gap-2">
+            {/* Mobile notification bell — real count */}
+            <button
+              onClick={() => navigate(getNotifPath(role))}
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary transition"
+            >
+              <FiBell className="w-4 h-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                  {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
-              </div>
-            )}
+              )}
+            </button>
+            <Avatar
+              user={user}
+              size="sm"
+              className="border-2 border-purple-500/50"
+            />
           </div>
         </header>
 
         {/* Desktop Top Header */}
-        <header className="hidden lg:flex items-center justify-between px-8 py-4  border-b border-theme bg-theme-secondary flex-shrink-0">
-          <h1 className="text-xl font-bold text-theme-primary leading-none">
-            {links.find((item) => location.pathname === item.path)?.label ||
-              "Dashboard"}
-          </h1>
-          <div className="flex items-center gap-3">
-            {/* Notification Bell */}
-            <button className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary transition flex-shrink-0">
+        <header className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-theme bg-theme-secondary flex-shrink-0">
+          <div>
+            <h1 className="text-xl font-bold text-theme-primary leading-none">
+              {pageTitle}
+            </h1>
+            <p className="text-theme-muted text-xs mt-0.5">
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Desktop notification bell — real count + animate */}
+            <button
+              onClick={() => navigate(getNotifPath(role))}
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary hover:border-purple-500/50 transition"
+              title="Notifications"
+            >
               <FiBell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 animate-pulse">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             </button>
+
             {/* Settings */}
-            <button className="w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary transition flex-shrink-0">
+            <button
+              onClick={() => navigate(getSettingsPath(role))}
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-theme bg-theme-card text-theme-secondary hover:text-theme-primary hover:border-purple-500/50 transition"
+              title="Settings"
+            >
               <FiSettings className="w-4 h-4" />
             </button>
+
             {/* Avatar */}
-            {user?.photoURL ? (
-              <img
-                src={user.photoURL}
-                alt=""
-                className="w-9 h-9 rounded-xl object-cover border-2 border-purple-500 flex-shrink-0"
+            <button
+              onClick={() => navigate(`/${role}/profile`)}
+              className="flex items-center gap-2 border border-theme bg-theme-card hover:border-purple-500/50 rounded-xl px-2.5 py-1.5 transition group"
+              title="My Profile"
+            >
+              <Avatar
+                user={user}
+                size="sm"
+                className="border-2 border-transparent group-hover:border-purple-500 transition rounded-lg"
               />
-            ) : (
-              <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-sm font-bold leading-none">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </span>
+              <div className="hidden xl:block text-left">
+                <p className="text-theme-primary text-xs font-semibold leading-none truncate max-w-[100px]">
+                  {user?.name}
+                </p>
+                <p className="text-theme-muted text-xs mt-0.5 capitalize">
+                  {user?.role}
+                </p>
               </div>
-            )}
+            </button>
           </div>
         </header>
+
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto p-6">
           <Outlet />
