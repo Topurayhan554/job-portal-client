@@ -40,6 +40,7 @@ const sidebarLinks = {
     { label: "Saved Jobs", path: "/seeker/saved", icon: <FiBookmark /> },
     { label: "Recommended", path: "/seeker/recommended", icon: <FiStar /> },
     { label: "CV Manager", path: "/seeker/cv", icon: <FiFile /> },
+
     { label: "Profile Views", path: "/seeker/views", icon: <FiEye /> },
     { label: "Notifications", path: "/seeker/notifications", icon: <FiBell /> },
     { label: "Settings", path: "/seeker/settings", icon: <FiSettings /> },
