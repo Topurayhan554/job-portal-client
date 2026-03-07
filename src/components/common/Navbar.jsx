@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "dark",
+    () => localStorage.getItem("theme") || "light",
   );
   const profileRef = useRef(null);
   const { user, logOut } = useAuth();
@@ -116,7 +116,7 @@ const Navbar = () => {
               <FaBriefcase className="text-white w-4 h-4" />
             </div>
             <span className="text-xl font-bold text-theme-primary">
-              Job<span className="text-purple-500">Portal</span>
+              Kaaj<span className="text-purple-500">Khojo</span>
             </span>
           </Link>
 

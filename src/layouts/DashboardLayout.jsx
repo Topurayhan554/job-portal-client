@@ -25,7 +25,7 @@ import useAuth from "../hooks/useAuth";
 import useNotifications from "../hooks/useNotifications";
 import toast from "react-hot-toast";
 
-// ===== Sidebar Links =====
+//  Sidebar Links
 const sidebarLinks = {
   seeker: [
     { label: "Dashboard", path: "/seeker/dashboard", icon: <FiHome /> },
@@ -80,7 +80,7 @@ const sidebarLinks = {
   ],
 };
 
-// ===== Profile Completion =====
+//  Profile Completion
 const calcProfileComplete = (user) => {
   if (!user) return 0;
   const checks = [
@@ -107,7 +107,7 @@ const calcProfileComplete = (user) => {
 const getNotifPath = (role) => `/${role}/notifications`;
 const getSettingsPath = (role) => `/${role}/settings`;
 
-// ===== Avatar =====
+//  Avatar
 const Avatar = ({ user, size = "sm", className = "" }) => {
   const photo = user?.profilePhoto || user?.photoURL;
   const dims = size === "sm" ? "w-9 h-9" : "w-12 h-12";
@@ -131,7 +131,7 @@ const Avatar = ({ user, size = "sm", className = "" }) => {
   );
 };
 
-// ===== Main Component =====
+//  Main Component
 const DashboardLayout = ({ role }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logOut } = useAuth();
@@ -154,7 +154,7 @@ const DashboardLayout = ({ role }) => {
     }
   };
 
-  // ===== Sidebar Content =====
+  //  Sidebar Content
   const SidebarContent = useCallback(
     () => (
       <div className="flex flex-col h-full">
@@ -164,8 +164,8 @@ const DashboardLayout = ({ role }) => {
             <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <FaBriefcase className="text-white w-4 h-4" />
             </div>
-            <span className="text-lg font-bold text-theme-primary">
-              Job<span className="text-purple-500">Portal</span>
+            <span className="text-xl font-bold text-theme-primary">
+              Kaaj<span className="text-purple-500">Khojo</span>
             </span>
           </Link>
         </div>
