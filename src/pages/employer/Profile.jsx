@@ -65,7 +65,7 @@ const Spinner = () => (
 
 const EmployerProfile = () => {
   const { profile, loading, updateProfile } = useEmployerProfile();
-  const { refreshUser } = useAuth();
+  const { refreshUser, user } = useAuth();
 
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -88,7 +88,12 @@ const EmployerProfile = () => {
     setBenefits(profile.benefits || []);
   }
 
-  const getPhoto = () => profile?.profilePhoto || profile?.photoURL || null;
+  const getPhoto = () =>
+    profile?.profilePhoto ||
+    profile?.photoURL ||
+    user?.profilePhoto ||
+    user?.photoURL ||
+    null;
 
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];

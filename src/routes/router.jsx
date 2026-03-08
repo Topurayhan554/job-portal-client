@@ -30,6 +30,8 @@ import { AiFillSecurityScan } from "react-icons/ai";
 import Security from "../pages/admin/Security";
 import AdminProfile from "../pages/admin/AdminProfile";
 import JobDetails from "../pages/Job/JobsDetails";
+import About from "../components/common/About";
+import InterviewQuestions from "../components/common/InterviewQuestions";
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +41,8 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "/jobs", element: <Jobs /> },
       { path: "/jobs/:id", element: <JobDetails /> },
+      { path: "/about", element: <About /> },
+      { path: "interview-questions", element: <InterviewQuestions /> },
     ],
   },
   // auth

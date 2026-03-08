@@ -74,7 +74,7 @@ const Register = () => {
     }
   };
 
-  // imgbb তে photo upload করো
+  // imgbb photo upload
   const uploadToImgbb = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -85,7 +85,7 @@ const Register = () => {
     return res.data.data.url;
   };
 
-  // DB তে User save করো
+  // DB User save
   const saveUserToDB = async (firebaseUser, extraData = {}) => {
     try {
       await api.post("/users", {
@@ -111,7 +111,7 @@ const Register = () => {
       const userCredential = await signUpFunc(data.email, data.password);
       const firebaseUser = userCredential.user;
 
-      // 2. imgbb তে photo upload
+      // 2. imgbb photo upload
       let photoURL = "";
       if (profileImg) {
         try {
@@ -128,13 +128,13 @@ const Register = () => {
         photoURL: photoURL || "",
       });
 
-      // 4. DB তে save করো
+      // 4. DB save
       await saveUserToDB(
         { ...firebaseUser, displayName: data.name, photoURL },
         { name: data.name, phone: data.phone || "", role: data.role },
       );
 
-      // 5. Sync করো
+      // 5. Sync
       await syncUserWithDatabase({
         ...firebaseUser,
         displayName: data.name,
@@ -193,7 +193,9 @@ const Register = () => {
               />
             </svg>
           </div>
-          <h1 className="text-4xl font-extrabold text-white mb-4">JobPortal</h1>
+          <span className="text-xl font-bold text-white">
+            Kaaj<span className="text-purple-400">Khojo</span>
+          </span>{" "}
           <p className="text-gray-400 text-lg leading-relaxed max-w-sm">
             Start your journey today. Thousands of opportunities are waiting for
             you.

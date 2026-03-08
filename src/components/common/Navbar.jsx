@@ -62,44 +62,36 @@ const Navbar = () => {
     return "/";
   };
 
-  //profilePhoto first, photoURL fallback
   const getPhoto = () => user?.profilePhoto || user?.photoURL || null;
 
-  const navLinks = [
+  // ── সবসময় দেখাবে ──
+  const commonLinks = [
     { name: "Browse Jobs", path: "/jobs" },
+    { name: "About", path: "/about" },
+    { name: "Interview Questions", path: "/interview-questions" },
+  ];
+
+  // ── শুধু guest ──
+  const guestLinks = [
+    ...commonLinks,
+    { name: "For Employers", path: "/register" },
+  ];
+
+  // ── শুধু logged in ──
+  const authLinks = [
+    ...commonLinks,
     ...(user?.role === "employer"
       ? [{ name: "Post a Job", path: "/employer/post-job" }]
       : []),
-    ...(user ? [{ name: "Dashboard", path: getDashboardLink() }] : []),
+    { name: "Dashboard", path: getDashboardLink() },
   ];
+
+  const navLinks = user ? authLinks : guestLinks;
 
   const roleColor = {
     seeker: "bg-blue-500",
     employer: "bg-purple-500",
     admin: "bg-red-500",
-  };
-
-  // ===== Reusable Avatar =====
-  const Avatar = ({ size = "sm", border = "" }) => {
-    const dimensions = size === "sm" ? "w-8 h-8" : "w-12 h-12";
-    const textSize = size === "sm" ? "text-sm" : "text-lg";
-    const rounded = size === "sm" ? "rounded-lg" : "rounded-xl";
-
-    return getPhoto() ? (
-      <img
-        src={getPhoto()}
-        alt={user?.name}
-        className={`${dimensions} ${rounded} object-cover ${border}`}
-      />
-    ) : (
-      <div
-        className={`${dimensions} bg-gradient-to-br from-purple-500 to-blue-500 ${rounded} flex items-center justify-center ${border}`}
-      >
-        <span className={`text-white ${textSize} font-bold`}>
-          {user?.name?.charAt(0).toUpperCase()}
-        </span>
-      </div>
-    );
   };
 
   return (
@@ -121,10 +113,10 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <NavLink
-                key={link.path}
+                key={link.path + link.name}
                 to={link.path}
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
@@ -163,19 +155,17 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium px-5 py-2.5 rounded-xl hover:from-purple-700 hover:to-blue-700 hover:scale-105 transition-all shadow-lg shadow-purple-900/30"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium px-5 py-2.5 rounded-xl hover:opacity-90 hover:scale-105 transition-all shadow-lg shadow-purple-900/30"
                 >
                   Get Started
                 </Link>
               </>
             ) : (
               <div className="relative" ref={profileRef}>
-                {/* Profile Button */}
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   className="flex items-center gap-2 border border-theme bg-black/5 dark:bg-white/5 hover:border-purple-500/50 rounded-xl px-3 py-2 transition-all duration-300 group"
                 >
-                  {/* Avatar — profilePhoto || photoURL */}
                   {getPhoto() ? (
                     <img
                       src={getPhoto()}
@@ -202,10 +192,8 @@ const Navbar = () => {
                 {/* Dropdown */}
                 {showProfileMenu && (
                   <div className="absolute top-full right-0 mt-3 w-72 bg-theme-card border border-theme rounded-2xl shadow-2xl overflow-hidden z-50">
-                    {/* Dropdown Header */}
                     <div className="p-4 bg-gradient-to-r from-purple-600 to-blue-600">
                       <div className="flex items-center gap-3">
-                        {/* Dropdown Avatar */}
                         {getPhoto() ? (
                           <img
                             src={getPhoto()}
@@ -230,16 +218,12 @@ const Navbar = () => {
                       </div>
                       <div className="mt-3">
                         <span
-                          className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase text-white ${
-                            roleColor[user.role] || "bg-gray-500"
-                          }`}
+                          className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase text-white ${roleColor[user.role] || "bg-gray-500"}`}
                         >
                           {user.role}
                         </span>
                       </div>
                     </div>
-
-                    {/* Dropdown Links */}
                     <div className="p-2">
                       <Link
                         to={getDashboardLink()}
@@ -257,7 +241,7 @@ const Navbar = () => {
                         <FiSettings className="w-4 h-4" />
                         <span className="text-sm font-medium">Settings</span>
                       </Link>
-                      <div className="border-t border-theme my-2"></div>
+                      <div className="border-t border-theme my-2" />
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-500/10 transition-all duration-200"
@@ -309,7 +293,7 @@ const Navbar = () => {
             <div className="space-y-1 mb-4">
               {navLinks.map((link) => (
                 <NavLink
-                  key={link.path}
+                  key={link.path + link.name}
                   to={link.path}
                   onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
@@ -345,7 +329,6 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div>
-                  {/* Mobile — profilePhoto || photoURL */}
                   <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-4 mb-3">
                     <div className="flex items-center gap-3">
                       {getPhoto() ? (
@@ -372,9 +355,7 @@ const Navbar = () => {
                     </div>
                     <div className="mt-2">
                       <span
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase text-white ${
-                          roleColor[user.role] || "bg-gray-500"
-                        }`}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase text-white ${roleColor[user.role] || "bg-gray-500"}`}
                       >
                         {user.role}
                       </span>
@@ -389,7 +370,6 @@ const Navbar = () => {
                     <FiUser className="w-4 h-4" />
                     <span className="text-sm font-medium">Dashboard</span>
                   </Link>
-
                   <Link
                     to="/settings"
                     onClick={() => setMenuOpen(false)}
@@ -398,7 +378,6 @@ const Navbar = () => {
                     <FiSettings className="w-4 h-4" />
                     <span className="text-sm font-medium">Settings</span>
                   </Link>
-
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-semibold transition active:scale-95"

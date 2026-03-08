@@ -122,7 +122,7 @@ const Login = () => {
               <FaBriefcase className="text-white w-4 h-4" />
             </div>
             <span className="text-xl font-bold text-white">
-              Job<span className="text-purple-400">Portal</span>
+              Kaaj<span className="text-purple-400">Khojo</span>
             </span>
           </Link>
         </div>
