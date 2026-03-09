@@ -86,13 +86,12 @@ kaajkhojo/
 │   │   ├── context/            # Auth context
 │   │   ├── hooks/              # Custom hooks
 │   │   ├── pages/              # Page components
-│   │   │   ├── Home.jsx
-│   │   │   ├── About.jsx
-│   │   │   ├── InterviewQuestions.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── seeker/
+│   │   │   ├── admin/
+│   │   │   ├── auth/
 │   │   │   ├── employer/
-│   │   │   └── admin/
+│   │   │   ├── job/
+│   │   │   ├── seeker/
+│   │   │   └── shared/
 │   │   ├── routes/             # React Router config
 │   │   └── services/           # API service
 │   └── vercel.json
