@@ -1,3 +1,5 @@
+import { FiCheckCircle, FiHeart, FiTarget, FiZap } from "react-icons/fi";
+
 export const questions = [
   // ── Tech ──
   {

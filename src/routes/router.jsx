@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router";
 import Home from "../components/Home";
-import MainLayouts from "../layouts/mainLayouts";
 import AuthLayouts from "../layouts/AuthLayouts";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
@@ -26,17 +25,17 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import ManageUsers from "../pages/admin/ManageUsers";
 import ManageJobs from "../pages/admin/ManageJobs";
 import AdminApplications from "../pages/admin/AdminApplications";
-import { AiFillSecurityScan } from "react-icons/ai";
 import Security from "../pages/admin/Security";
 import AdminProfile from "../pages/admin/AdminProfile";
 import JobDetails from "../pages/Job/JobsDetails";
 import About from "../components/common/About";
 import InterviewQuestions from "../components/common/InterviewQuestions";
+import RootLayout from "../layouts/RootLayout";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayouts />,
+    element: <RootLayout />,
     children: [
       { index: true, element: <Home /> },
       { path: "/jobs", element: <Jobs /> },

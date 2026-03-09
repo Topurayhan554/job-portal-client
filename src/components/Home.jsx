@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaBriefcase,
@@ -9,40 +9,36 @@ import {
   FaChartLine,
   FaShieldAlt,
   FaArrowRight,
-  FaMapMarkerAlt,
   FaStar,
+  FaQuoteLeft,
+  FaAppStore,
+  FaGooglePlay,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 import {
   FiUsers,
-  FiTrendingUp,
-  FiBookmark,
   FiCheckCircle,
   FiArrowUpRight,
+  FiClock,
+  FiMapPin,
+  FiChevronRight,
 } from "react-icons/fi";
 import api from "../services/api";
 
-//  Animations
+// ── Animations ──
 const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.6 } },
-};
-const stagger = { visible: { transition: { staggerChildren: 0.09 } } };
+const stagger = { visible: { transition: { staggerChildren: 0.07 } } };
 const scaleIn = {
-  hidden: { opacity: 0, scale: 0.9, y: 10 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
-  },
+  hidden: { opacity: 0, scale: 0.93, y: 8 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.4 } },
 };
 
 const typeColors = {
@@ -53,62 +49,164 @@ const typeColors = {
   Internship: "bg-pink-500/10 text-pink-400 border border-pink-500/20",
 };
 
-const features = [
+const jobCategories = [
+  "All",
+  "Technology",
+  "Design",
+  "Marketing",
+  "Finance",
+  "Management",
+  "HR",
+  "Sales",
+];
+const popularTags = [
+  "React Developer",
+  "UI Designer",
+  "Python",
+  "Remote Jobs",
+  "Node.js",
+  "Full-time",
+];
+
+const partnerLogos = [
   {
-    icon: <FaBrain className="w-5 h-5" />,
-    title: "AI-Powered Matching",
-    desc: "Smart algorithm matches your skills with the perfect job opportunities in real time.",
-    accent: "from-violet-500 to-purple-700",
-    glow: "shadow-violet-500/20",
+    name: "bKash",
+    image: "/partners/bkash.png",
+    bg: "bg-pink-50    dark:bg-pink-950/40",
+    border: "border-pink-200    dark:border-pink-800/40",
   },
   {
-    icon: <FaChartLine className="w-5 h-5" />,
-    title: "Real-time Tracking",
-    desc: "Track your application status live — from Applied to Hired with instant notifications.",
-    accent: "from-blue-500 to-cyan-600",
-    glow: "shadow-blue-500/20",
+    name: "Pathao",
+    image: "/partners/pathao.png",
+    bg: "bg-orange-50  dark:bg-orange-950/40",
+    border: "border-orange-200  dark:border-orange-800/40",
   },
   {
-    icon: <FaRocket className="w-5 h-5" />,
-    title: "Fast Applications",
-    desc: "One-click apply with your saved CV and cover letter template. No forms to fill.",
-    accent: "from-rose-500 to-pink-700",
-    glow: "shadow-rose-500/20",
+    name: "ShajGoj",
+    image: "/partners/shajgoj.png",
+    bg: "bg-teal-50    dark:bg-teal-950/40",
+    border: "border-teal-200    dark:border-teal-800/40",
   },
   {
-    icon: <FaShieldAlt className="w-5 h-5" />,
-    title: "Verified Companies",
-    desc: "Every employer is verified to ensure safe, legitimate job listings on our platform.",
-    accent: "from-emerald-500 to-teal-700",
-    glow: "shadow-emerald-500/20",
+    name: "Chaldal",
+    image: "/partners/chaldal.png",
+    bg: "bg-green-50   dark:bg-green-950/40",
+    border: "border-green-200   dark:border-green-800/40",
+  },
+  {
+    name: "Shikho",
+    image: "/partners/shikho.png",
+    bg: "bg-violet-50  dark:bg-violet-950/40",
+    border: "border-violet-200  dark:border-violet-800/40",
+  },
+  {
+    name: "10 Minute School",
+    image: "/partners/10minuteschool.png",
+    bg: "bg-blue-50    dark:bg-blue-950/40",
+    border: "border-blue-200    dark:border-blue-800/40",
+  },
+  {
+    name: "Augmedix",
+    image: "/partners/augmedix.png",
+    bg: "bg-red-50     dark:bg-red-950/40",
+    border: "border-red-200     dark:border-red-800/40",
+  },
+  {
+    name: "CMED Health",
+    image: "/partners/CMDHealth.png",
+    bg: "bg-sky-50     dark:bg-sky-950/40",
+    border: "border-sky-200     dark:border-sky-800/40",
+  },
+  {
+    name: "Khaas Food",
+    image: "/partners/khaasfood.png",
+    bg: "bg-lime-50    dark:bg-lime-950/40",
+    border: "border-lime-200    dark:border-lime-800/40",
+  },
+  {
+    name: "Shohoz",
+    image: "/partners/shohoz.png",
+    bg: "bg-fuchsia-50 dark:bg-fuchsia-950/40",
+    border: "border-fuchsia-200 dark:border-fuchsia-800/40",
   },
 ];
 
-const categories = [
-  { label: "Technology", icon: "💻", query: "Technology" },
-  { label: "Design", icon: "🎨", query: "Design" },
-  { label: "Marketing", icon: "📢", query: "Marketing" },
-  { label: "Finance", icon: "💰", query: "Finance" },
-  { label: "Management", icon: "📊", query: "Management" },
-  { label: "HR", icon: "🤝", query: "HR" },
-  { label: "Sales", icon: "🏆", query: "Sales" },
-  { label: "Remote", icon: "🌍", query: "" },
+const quickLinks = [
+  { label: "All Jobs (750+)", href: "/jobs" },
+  { label: "Fresher Jobs (12)", href: "/jobs?experience=Entry Level" },
+  { label: "Internship (7)", href: "/jobs?type=Internship" },
+  { label: "Walk-in Interviews (4)", href: "/jobs" },
+  { label: "Remote Jobs (42)", href: "/jobs?type=Remote" },
 ];
 
-//  Skeletons
+const testimonials = [
+  {
+    name: "Rafiq Ahmed",
+    role: "Software Engineer",
+    company: "Pathao",
+    text: "This platform is a complete help for the job market in Bangladesh. Found my dream job within 2 weeks of signing up. Highly recommended!",
+    avatar: "R",
+    color: "from-violet-600 to-blue-600",
+    rating: 5,
+    image: "/testimonials/rafiq.jpg",
+  },
+  {
+    name: "Nadia Islam",
+    role: "Product Designer",
+    company: "bKash",
+    text: "I got three job offers after registering here. The interview prep section was incredibly helpful and the company quality is outstanding.",
+    avatar: "N",
+    color: "from-pink-500 to-rose-500",
+    rating: 5,
+    image: "/testimonials/nadia.jpg",
+  },
+  {
+    name: "Mizanur Rahman",
+    role: "Marketing Manager",
+    company: "Shikho",
+    text: "As an experienced professional, I was skeptical — but the quality of listings here is genuinely better than anywhere else. Got hired in a month!",
+    avatar: "M",
+    color: "from-emerald-500 to-teal-500",
+    rating: 5,
+    image: "/testimonials/mizanur.jpg",
+  },
+  {
+    name: "Sadia Akter",
+    role: "HR Executive",
+    company: "Augmedix",
+    text: "The best job platform for Bangladesh. The filters are excellent and company verification gives real confidence. Highly recommend.",
+    avatar: "S",
+    color: "from-amber-500 to-orange-500",
+    rating: 5,
+    image: "/testimonials/sadia.jpg",
+  },
+  {
+    name: "Tanvir Hossain",
+    role: "Full Stack Developer",
+    company: "Chaldal",
+    text: "Applied to 5 jobs, got 3 interviews, accepted 1 amazing offer. The process was smooth and the platform is beautifully designed!",
+    avatar: "T",
+    color: "from-cyan-500 to-blue-500",
+    rating: 5,
+    image: "/testimonials/tanvir.jpg",
+  },
+];
+
+// ── Skeletons ──
 const JobCardSkeleton = () => (
-  <div className="card-theme border rounded-2xl p-6 animate-pulse">
-    <div className="flex items-start justify-between mb-4">
-      <div className="w-11 h-11 bg-theme-primary/20 rounded-xl" />
-      <div className="w-16 h-5 bg-theme-primary/15 rounded-full" />
+  <div className="card-theme border rounded-2xl p-5 animate-pulse">
+    <div className="flex items-start gap-3 mb-3">
+      <div className="w-10 h-10 bg-theme-primary/20 rounded-xl flex-shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 bg-theme-primary/25 rounded w-3/4" />
+        <div className="h-3 bg-theme-primary/15 rounded w-1/2" />
+      </div>
     </div>
-    <div className="h-5 bg-theme-primary/25 rounded-lg w-3/4 mb-2" />
-    <div className="h-4 bg-theme-primary/15 rounded-lg w-1/2 mb-4" />
-    <div className="flex gap-2 mb-4">
+    <div className="flex gap-2 mb-3">
       <div className="h-5 bg-theme-primary/15 rounded-full w-16" />
       <div className="h-5 bg-theme-primary/15 rounded-full w-20" />
     </div>
-    <div className="border-t border-theme pt-4 flex justify-between">
+    <div className="border-t border-theme pt-3 flex justify-between">
       <div className="h-4 bg-theme-primary/20 rounded w-20" />
       <div className="h-4 bg-theme-primary/15 rounded w-14" />
     </div>
@@ -116,24 +214,245 @@ const JobCardSkeleton = () => (
 );
 
 const StatSkeleton = () => (
-  <div className="animate-pulse text-center">
-    <div className="h-9 bg-white/15 rounded-xl w-24 mx-auto mb-2" />
-    <div className="h-3.5 bg-white/10 rounded w-20 mx-auto" />
+  <div className="animate-pulse card-theme border rounded-2xl p-4">
+    <div className="h-7 bg-theme-primary/20 rounded w-20 mb-1" />
+    <div className="h-3 bg-theme-primary/10 rounded w-16" />
   </div>
 );
 
-//  Home ─
+// ── Job Card ──
+const JobCard = ({ job }) => {
+  const salary =
+    job.salaryMin && job.salaryMax
+      ? `৳${(job.salaryMin / 1000).toFixed(0)}k–${(job.salaryMax / 1000).toFixed(0)}k`
+      : job.salaryMin
+        ? `৳${(job.salaryMin / 1000).toFixed(0)}k+`
+        : "Negotiable";
+  return (
+    <Link
+      to={`/jobs/${job._id}`}
+      className="group card-theme block border hover:border-purple-500/40 rounded-2xl p-5 transition-all duration-300 hover:bg-purple-500/[0.03]"
+    >
+      <div className="flex items-start gap-3 mb-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-purple-500/15 to-blue-500/15 border border-theme rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+          {job.postedBy?.profilePhoto ? (
+            <img
+              src={job.postedBy.profilePhoto}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <FaBriefcase className="text-purple-400 w-4 h-4" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-theme-primary font-semibold text-sm leading-snug group-hover:text-purple-400 transition truncate">
+            {job.title}
+          </h3>
+          <p className="text-theme-muted text-xs mt-0.5">
+            {job.company || job.postedBy?.companyName}
+          </p>
+        </div>
+        {job.featured && (
+          <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+            <FaStar className="w-2 h-2 fill-current" /> Featured
+          </span>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-1.5 mb-3">
+        <span
+          className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${typeColors[job.type] || "bg-gray-500/10 text-gray-400"}`}
+        >
+          {job.type}
+        </span>
+        {(job.skills || []).slice(0, 2).map((s) => (
+          <span
+            key={s}
+            className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full"
+          >
+            {s}
+          </span>
+        ))}
+      </div>
+      <div className="border-t border-theme pt-3 flex items-center justify-between">
+        <div className="flex items-center gap-3 text-xs text-theme-muted">
+          <span className="flex items-center gap-1">
+            <FiMapPin className="w-3 h-3" />
+            {job.location}
+          </span>
+          <span className="flex items-center gap-1">
+            <FiClock className="w-3 h-3" />
+            {new Date(job.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+        <span className="text-purple-400 font-bold text-sm">{salary}</span>
+      </div>
+    </Link>
+  );
+};
+
+// ── Infinite Logo Carousel ──
+const LogoCarousel = () => {
+  const doubled = [...partnerLogos, ...partnerLogos];
+  return (
+    <div className="relative overflow-hidden">
+      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-theme-secondary to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-theme-secondary to-transparent z-10 pointer-events-none" />
+      <motion.div
+        animate={{ x: ["0%", "-50%"] }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        className="flex gap-4 w-max py-1"
+      >
+        {doubled.map((logo, i) => (
+          <div
+            key={i}
+            className={`flex-shrink-0 flex items-center justify-center h-16 w-40 rounded-2xl hover:-translate-y-1 transition-all duration-300 cursor-default`}
+          >
+            <img
+              src={logo.image}
+              alt={logo.name}
+              className="h-10 w-full object-contain"
+            />
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
+// ── Testimonial Carousel ──
+const TestimonialCarousel = () => {
+  const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const timerRef = useRef(null);
+  const total = testimonials.length;
+
+  const go = (dir) => {
+    setDirection(dir);
+    setCurrent((prev) => (prev + dir + total) % total);
+  };
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => go(1), 4500);
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  const resetTimer = (dir) => {
+    clearInterval(timerRef.current);
+    go(dir);
+    timerRef.current = setInterval(() => go(1), 4500);
+  };
+
+  const visible = [0, 1, 2].map(
+    (offset) => testimonials[(current + offset) % total],
+  );
+
+  return (
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {visible.map((t, idx) => (
+          <motion.div
+            key={`${current}-${idx}`}
+            initial={{ opacity: 0, x: direction * 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              duration: 0.42,
+              delay: idx * 0.07,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className={`card-theme border rounded-2xl p-6 transition-all duration-300
+              ${idx === 0 ? "border-purple-500/30 shadow-lg shadow-purple-500/5" : ""}
+              ${idx > 0 ? "hidden md:block" : ""}`}
+          >
+            <div className="flex gap-0.5 mb-3">
+              {Array.from({ length: t.rating }).map((_, i) => (
+                <FaStar
+                  key={i}
+                  className="w-3 h-3 text-amber-400 fill-current"
+                />
+              ))}
+            </div>
+            <FaQuoteLeft className="text-purple-500/20 w-6 h-6 mb-3" />
+            <p className="text-theme-secondary text-sm leading-relaxed mb-5">
+              "{t.text}"
+            </p>
+            <div className="flex items-center gap-3 pt-4 border-t border-theme">
+              <div
+                className={`w-10 h-10 rounded-full flex-shrink-0 overflow-hidden border-2 border-purple-500/30 ${!t.image ? `bg-gradient-to-br ${t.color}` : ""}`}
+              >
+                {t.image ? (
+                  <img
+                    src={t.image}
+                    alt={t.name}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <div
+                    className={`w-full h-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm`}
+                  >
+                    {t.avatar}
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-theme-primary font-semibold text-sm">
+                  {t.name}
+                </p>
+                <p className="text-theme-muted text-xs">
+                  {t.role} @ {t.company}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center justify-center gap-4 mt-8">
+        <button
+          onClick={() => resetTimer(-1)}
+          className="w-9 h-9 rounded-full border border-theme text-theme-muted hover:text-purple-400 hover:border-purple-500/50 flex items-center justify-center transition"
+        >
+          <FaChevronLeft className="w-3.5 h-3.5" />
+        </button>
+        <div className="flex items-center gap-2">
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                setDirection(i > current ? 1 : -1);
+                setCurrent(i);
+                clearInterval(timerRef.current);
+              }}
+              className={`rounded-full transition-all duration-300 ${i === current ? "w-6 h-2 bg-purple-500" : "w-2 h-2 bg-theme-muted/30 hover:bg-purple-400/50"}`}
+            />
+          ))}
+        </div>
+        <button
+          onClick={() => resetTimer(1)}
+          className="w-9 h-9 rounded-full border border-theme text-theme-muted hover:text-purple-400 hover:border-purple-500/50 flex items-center justify-center transition"
+        >
+          <FaChevronRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ── Main ──
 const Home = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
   const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [liveJobs, setLiveJobs] = useState([]);
   const [jobsLoading, setJobsLoading] = useState(true);
+  const [liveLoading, setLiveLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
-  const [catCounts, setCatCounts] = useState({});
 
   useEffect(() => {
-    const fetchFeatured = async () => {
+    const fetch = async () => {
       try {
         const res = await api.get("/jobs?featured=true&limit=6&sort=featured");
         let jobs = res.data.jobs || [];
@@ -153,55 +472,52 @@ const Home = () => {
         setJobsLoading(false);
       }
     };
-    fetchFeatured();
+    fetch();
   }, []);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetch = async () => {
+      setLiveLoading(true);
       try {
-        const [jobsRes, usersRes] = await Promise.all([
+        const p = activeTab !== "All" ? `&category=${activeTab}` : "";
+        const res = await api.get(`/jobs?sort=newest&limit=8${p}`);
+        setLiveJobs(res.data.jobs || []);
+      } catch {
+        setLiveJobs([]);
+      } finally {
+        setLiveLoading(false);
+      }
+    };
+    fetch();
+  }, [activeTab]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const [j, r] = await Promise.all([
           api.get("/jobs?limit=1"),
           api.get("/jobs?limit=1&type=Remote"),
         ]);
         setStats({
-          totalJobs: jobsRes.data.total || 0,
-          remoteJobs: usersRes.data.total || 0,
+          totalJobs: j.data.total || 0,
+          remoteJobs: r.data.total || 0,
         });
-        const cats = [
-          "Technology",
-          "Design",
-          "Marketing",
-          "Finance",
-          "Management",
-          "HR",
-          "Sales",
-        ];
-        const counts = {};
-        await Promise.all(
-          cats.map(async (cat) => {
-            try {
-              const r = await api.get(`/jobs?category=${cat}&limit=1`);
-              counts[cat] = r.data.total || 0;
-            } catch {
-              counts[cat] = 0;
-            }
-          }),
-        );
-        setCatCounts(counts);
       } catch {
         setStats({ totalJobs: 0, remoteJobs: 0 });
       } finally {
         setStatsLoading(false);
       }
     };
-    fetchStats();
+    fetch();
   }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (search.trim())
-      navigate(`/jobs?search=${encodeURIComponent(search.trim())}`);
-    else navigate("/jobs");
+    navigate(
+      search.trim()
+        ? `/jobs?search=${encodeURIComponent(search.trim())}`
+        : "/jobs",
+    );
   };
 
   const dynamicStats = stats
@@ -222,291 +538,236 @@ const Home = () => {
 
   return (
     <div className="bg-theme-primary text-theme-primary overflow-x-hidden">
-      {/* ══ HERO ═══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center justify-center px-6 py-24 overflow-hidden">
-        {/* Background mesh */}
+      {/* ══ HERO ══════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden border-b border-theme py-16 px-6">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-purple-600 opacity-[0.07] rounded-full blur-[130px]" />
-          <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-600 opacity-[0.07] rounded-full blur-[120px]" />
-          <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-violet-500 opacity-[0.04] rounded-full blur-[90px]" />
-          {/* Grid overlay */}
+          <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-600 opacity-[0.06] rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 right-[-5%] w-[400px] h-[400px] bg-blue-600 opacity-[0.06] rounded-full blur-[100px]" />
           <div
-            className="absolute inset-0 opacity-[0.025]"
+            className="absolute inset-0 opacity-[0.02]"
             style={{
               backgroundImage:
                 "linear-gradient(currentColor 1px,transparent 1px),linear-gradient(90deg,currentColor 1px,transparent 1px)",
-              backgroundSize: "60px 60px",
+              backgroundSize: "48px 48px",
             }}
           />
         </div>
 
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          {/* Badge */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/25 text-purple-400 text-xs font-semibold px-4 py-2 rounded-full mb-8 tracking-wide uppercase"
-          >
-            <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" />
-            Bangladesh's #1 Job Portal
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.08 }}
-            className="text-5xl sm:text-6xl md:text-[5.5rem] font-extrabold leading-[1.05] tracking-tight mb-6 text-theme-primary"
-          >
-            Find Your{" "}
-            <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-                Dream Job
-              </span>
-              <motion.span
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{
-                  delay: 0.7,
-                  duration: 0.6,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="absolute -bottom-1 left-0 right-0 h-[3px] bg-gradient-to-r from-violet-500 to-blue-500 rounded-full origin-left"
-              />
-            </span>{" "}
-            Today
-          </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.15 }}
-            className="text-theme-muted text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed"
-          >
-            Connect with top companies across Bangladesh. Get matched with the
-            right opportunities and launch your dream career.
-          </motion.p>
-
-          {/* Search Bar */}
-          <motion.form
-            onSubmit={handleSearch}
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.22 }}
-            className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-8"
-          >
-            <div className="relative flex-1">
-              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Job title, skill, or company..."
-                className="input-theme w-full border rounded-xl pl-11 pr-4 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/60 transition placeholder:text-theme-muted/50"
-              />
-            </div>
-            <button
-              type="submit"
-              className="group relative overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:opacity-95 transition shadow-xl shadow-purple-900/25 flex items-center justify-center gap-2 whitespace-nowrap"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Search Jobs{" "}
-                <FaArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </span>
-            </button>
-          </motion.form>
-
-          {/* Popular Tags */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.28 }}
-            className="flex flex-wrap gap-2 justify-center mb-12"
-          >
-            <span className="text-theme-muted text-xs self-center font-medium uppercase tracking-wider">
-              Trending:
-            </span>
-            {[
-              "React Developer",
-              "UI Designer",
-              "Python",
-              "Remote Jobs",
-              "Node.js",
-              "Full-time",
-            ].map((tag) => (
-              <button
-                key={tag}
-                onClick={() =>
-                  navigate(`/jobs?search=${encodeURIComponent(tag)}`)
-                }
-                className="text-xs text-theme-secondary hover:text-purple-400 bg-theme-card border border-theme hover:border-purple-500/40 px-3 py-1.5 rounded-full transition"
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/25 text-purple-400 text-xs font-semibold px-4 py-2 rounded-full mb-6 tracking-wide uppercase"
               >
-                {tag}
-              </button>
-            ))}
-          </motion.div>
+                <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" />
+                Bangladesh's #1 Job Portal
+              </motion.div>
 
-          {/* Trust signals */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.34 }}
-            className="flex flex-wrap items-center justify-center gap-6 text-xs text-theme-muted"
-          >
-            {[
-              {
-                icon: (
-                  <FiCheckCircle className="text-emerald-400 w-3.5 h-3.5" />
-                ),
-                label: "Verified Employers",
-              },
-              {
-                icon: <FiUsers className="text-blue-400 w-3.5 h-3.5" />,
-                label: "50,000+ Job Seekers",
-              },
-              {
-                icon: <FiBookmark className="text-violet-400 w-3.5 h-3.5" />,
-                label: "Save Jobs Easily",
-              },
-              {
-                icon: <FiTrendingUp className="text-amber-400 w-3.5 h-3.5" />,
-                label: "Real-time Tracking",
-              },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5">
-                {item.icon}
-                <span>{item.label}</span>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+              <motion.h1
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.08 }}
+                className="text-4xl sm:text-5xl md:text-[3.8rem] font-extrabold leading-[1.08] tracking-tight mb-5 text-theme-primary"
+              >
+                Real Jobs,{" "}
+                <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  Real Salaries
+                </span>
+                <br />
+                For Experienced
+                <br />
+                Professionals Only
+              </motion.h1>
 
-      {/* ══ STATS ══════════════════════════════════════════════ */}
-      <section className="py-16 border-y border-theme relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-violet-900/15 via-blue-900/10 to-violet-900/15" />
-        <div className="max-w-5xl mx-auto px-6 relative">
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
-          >
-            {statsLoading || !dynamicStats
-              ? [1, 2, 3, 4].map((i) => <StatSkeleton key={i} />)
-              : dynamicStats.map((stat, i) => (
-                  <motion.div key={i} variants={scaleIn} className="group">
-                    <p className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent mb-1">
-                      {stat.value}
-                    </p>
-                    <p className="text-theme-muted text-xs md:text-sm font-medium">
-                      {stat.label}
-                    </p>
-                  </motion.div>
-                ))}
-          </motion.div>
-        </div>
-      </section>
+              <motion.p
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.14 }}
+                className="text-theme-muted text-base mb-8 max-w-lg leading-relaxed"
+              >
+                Connect with top companies across Bangladesh. Get matched with
+                the right opportunity and launch your dream career today.
+              </motion.p>
 
-      {/* ══ CATEGORIES ═════════════════════════════════════════ */}
-      <section className="py-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">
-              Explore Opportunities
-            </p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-theme-primary mb-4 tracking-tight">
-              Browse by Category
-            </h2>
-            <p className="text-theme-muted max-w-md mx-auto">
-              Thousands of jobs across every industry, curated for you
-            </p>
-          </motion.div>
+              <motion.form
+                onSubmit={handleSearch}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.2 }}
+                className="flex flex-col sm:flex-row gap-3 mb-6 max-w-xl"
+              >
+                <div className="relative flex-1">
+                  <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Job title, skill, or company..."
+                    className="input-theme w-full border rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/60 transition"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="bg-gradient-to-r from-violet-600 to-blue-600 text-white px-7 py-3.5 rounded-xl font-semibold hover:opacity-95 transition shadow-lg shadow-purple-900/25 flex items-center justify-center gap-2 whitespace-nowrap"
+                >
+                  <FaSearch className="w-3.5 h-3.5" /> Search
+                </button>
+              </motion.form>
 
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-3.5"
-          >
-            {categories.map((cat, i) => {
-              const count = catCounts[cat.label];
-              return (
-                <motion.div key={i} variants={scaleIn}>
-                  <Link
-                    to={
-                      cat.query
-                        ? `/jobs?category=${cat.query}`
-                        : `/jobs?type=Remote`
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.26 }}
+                className="flex flex-wrap gap-2 items-center"
+              >
+                <span className="text-theme-muted text-xs font-medium">
+                  Popular:
+                </span>
+                {popularTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() =>
+                      navigate(`/jobs?search=${encodeURIComponent(tag)}`)
                     }
-                    className="group card-theme flex flex-col items-center gap-3 border hover:border-purple-500/40 rounded-2xl p-6 text-center hover:bg-purple-500/5 transition-all duration-300"
+                    className="text-xs text-theme-secondary hover:text-purple-400 bg-theme-card border border-theme hover:border-purple-500/40 px-3 py-1.5 rounded-full transition"
                   >
-                    <span className="text-3xl group-hover:scale-110 transition-transform duration-300">
-                      {cat.icon}
-                    </span>
-                    <p className="text-theme-primary font-semibold text-sm group-hover:text-purple-400 transition-colors">
-                      {cat.label}
-                    </p>
-                    <p className="text-theme-muted text-xs">
-                      {statsLoading ? (
-                        <span className="inline-block w-10 h-3 bg-theme-primary/15 rounded animate-pulse" />
-                      ) : count !== undefined ? (
-                        `${count}+ jobs`
-                      ) : (
-                        "—"
-                      )}
-                    </p>
+                    {tag}
+                  </button>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Right stats card */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.3 }}
+              className="hidden lg:block"
+            >
+              <div className="card-theme border border-purple-500/20 rounded-3xl p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/5 rounded-full blur-2xl" />
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  {statsLoading || !dynamicStats
+                    ? [1, 2, 3, 4].map((i) => <StatSkeleton key={i} />)
+                    : dynamicStats.map((s, i) => (
+                        <div
+                          key={i}
+                          className="card-theme border rounded-2xl p-4"
+                        >
+                          <p className="text-2xl font-extrabold bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+                            {s.value}
+                          </p>
+                          <p className="text-theme-muted text-xs mt-1">
+                            {s.label}
+                          </p>
+                        </div>
+                      ))}
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-theme-muted uppercase tracking-wider mb-3">
+                    Latest Openings
+                  </p>
+                  {jobsLoading
+                    ? [1, 2, 3].map((i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 animate-pulse"
+                        >
+                          <div className="w-8 h-8 bg-theme-primary/20 rounded-lg flex-shrink-0" />
+                          <div className="flex-1 space-y-1">
+                            <div className="h-3 bg-theme-primary/20 rounded w-3/4" />
+                            <div className="h-2.5 bg-theme-primary/15 rounded w-1/2" />
+                          </div>
+                        </div>
+                      ))
+                    : featuredJobs.slice(0, 3).map((job) => (
+                        <Link
+                          key={job._id}
+                          to={`/jobs/${job._id}`}
+                          className="flex items-center gap-3 group hover:bg-purple-500/5 p-2 rounded-xl transition"
+                        >
+                          <div className="w-8 h-8 bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-theme rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {job.postedBy?.profilePhoto ? (
+                              <img
+                                src={job.postedBy.profilePhoto}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <FaBriefcase className="text-purple-400 w-3.5 h-3.5" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-theme-primary text-xs font-semibold group-hover:text-purple-400 transition truncate">
+                              {job.title}
+                            </p>
+                            <p className="text-theme-muted text-[11px]">
+                              {job.company || job.postedBy?.companyName}
+                            </p>
+                          </div>
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 ${typeColors[job.type] || "bg-gray-500/10 text-gray-400"}`}
+                          >
+                            {job.type}
+                          </span>
+                        </Link>
+                      ))}
+                  <Link
+                    to="/jobs"
+                    className="flex items-center justify-center gap-1 text-purple-400 hover:text-purple-300 text-xs font-medium pt-2 transition"
+                  >
+                    View all jobs <FiChevronRight className="w-3.5 h-3.5" />
                   </Link>
-                </motion.div>
-              );
-            })}
-          </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
+      {/* ══ PARTNER LOGO CAROUSEL ═════════════════════════════════════ */}
+      <section className="py-10 border-b border-theme bg-theme-secondary">
+        <p className="text-xs font-bold text-theme-muted uppercase tracking-widest text-center mb-6">
+          Trusted by Top Companies
+        </p>
+        <LogoCarousel />
+      </section>
 
-      {/* ══ FEATURED JOBS ══════════════════════════════════════ */}
-      <section className="py-24 px-6 bg-theme-secondary">
-        <div className="max-w-6xl mx-auto">
+      {/* ══ FEATURED JOBS ══════════════════════════════════════════════ */}
+      <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="flex items-end justify-between mb-14"
+            className="flex items-end justify-between mb-10"
           >
             <div>
-              <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">
+              <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">
                 Top Picks
               </p>
-              <h2 className="text-4xl md:text-5xl font-extrabold text-theme-primary tracking-tight mb-2">
+              <h2 className="text-3xl font-extrabold text-theme-primary tracking-tight">
                 Featured Jobs
               </h2>
-              <p className="text-theme-muted">
-                Hand-picked opportunities from top companies
+              <p className="text-theme-muted text-sm mt-1">
+                Hand-picked opportunities from verified companies
               </p>
             </div>
             <Link
               to="/jobs"
-              className="hidden md:flex items-center gap-2 text-purple-400 hover:text-purple-300 border border-purple-500/30 hover:border-purple-500/60 px-5 py-2.5 rounded-xl transition text-sm font-medium"
+              className="hidden md:flex items-center gap-2 text-purple-400 hover:text-purple-300 border border-purple-500/30 hover:border-purple-500/60 px-4 py-2 rounded-xl transition text-sm font-medium"
             >
               View All <FiArrowUpRight className="w-4 h-4" />
             </Link>
           </motion.div>
-
           <motion.div
             variants={stagger}
             initial="hidden"
@@ -516,152 +777,168 @@ const Home = () => {
           >
             {jobsLoading
               ? [1, 2, 3, 4, 5, 6].map((i) => <JobCardSkeleton key={i} />)
-              : featuredJobs.map((job) => {
-                  const salary =
-                    job.salaryMin && job.salaryMax
-                      ? `৳${(job.salaryMin / 1000).toFixed(0)}k–${(job.salaryMax / 1000).toFixed(0)}k`
-                      : job.salaryMin
-                        ? `৳${(job.salaryMin / 1000).toFixed(0)}k+`
-                        : "Negotiable";
-
-                  return (
-                    <motion.div
-                      key={job._id}
-                      variants={fadeUp}
-                      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    >
-                      <Link
-                        to={`/jobs/${job._id}`}
-                        className="group card-theme block border hover:border-purple-500/40 rounded-2xl p-5 hover:bg-purple-500/[0.03] transition-all duration-300 h-full"
-                      >
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="w-11 h-11 bg-gradient-to-br from-purple-500/15 to-blue-500/15 border border-theme rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
-                            {job.postedBy?.profilePhoto ? (
-                              <img
-                                src={job.postedBy.profilePhoto}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <FaBriefcase className="text-purple-400 w-4 h-4" />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                            {job.featured && (
-                              <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                <FaStar className="w-2 h-2 fill-current" />{" "}
-                                Featured
-                              </span>
-                            )}
-                            <span
-                              className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${typeColors[job.type] || "bg-gray-500/10 text-gray-400 border border-gray-500/20"}`}
-                            >
-                              {job.type}
-                            </span>
-                          </div>
-                        </div>
-
-                        <h3 className="text-theme-primary font-bold text-base mb-1 group-hover:text-purple-400 transition-colors leading-snug">
-                          {job.title}
-                        </h3>
-                        <p className="text-purple-400 text-xs mb-3 font-semibold">
-                          {job.company || job.postedBy?.companyName}
-                        </p>
-
-                        {(job.skills || []).length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 mb-3">
-                            {job.skills.slice(0, 3).map((s) => (
-                              <span
-                                key={s}
-                                className="text-xs bg-theme-card border border-theme text-theme-muted px-2.5 py-0.5 rounded-full"
-                              >
-                                {s}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        <div className="flex items-center gap-4 text-xs text-theme-muted mb-0">
-                          <span className="flex items-center gap-1">
-                            <FaMapMarkerAlt className="w-3 h-3" />{" "}
-                            {job.location}
-                          </span>
-                          {job.applicantsCount > 0 && (
-                            <span className="flex items-center gap-1">
-                              <FiUsers className="w-3 h-3" />{" "}
-                              {job.applicantsCount} applied
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="mt-4 pt-4 border-t border-theme flex items-center justify-between">
-                          <span className="text-purple-400 font-bold text-sm">
-                            {salary}
-                          </span>
-                          <span className="text-xs text-theme-muted group-hover:text-purple-400 transition flex items-center gap-1 font-medium">
-                            Apply Now <FiArrowUpRight className="w-3.5 h-3.5" />
-                          </span>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-          </motion.div>
-
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center mt-8 md:hidden"
-          >
-            <Link
-              to="/jobs"
-              className="text-purple-400 hover:text-purple-300 transition text-sm font-medium"
-            >
-              View all jobs →
-            </Link>
+              : featuredJobs.map((job) => (
+                  <motion.div
+                    key={job._id}
+                    variants={scaleIn}
+                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  >
+                    <JobCard job={job} />
+                  </motion.div>
+                ))}
           </motion.div>
         </div>
       </section>
-
-      {/* ══ FEATURES ═══════════════════════════════════════════ */}
-      <section className="py-24 px-6">
-        <div className="max-w-6xl mx-auto">
+      {/* ══ INTERVIEW PREP ════════════════════════════════════════════ */}
+      <section className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="text-center mb-14"
+            className="flex items-end justify-between mb-10"
           >
-            <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">
-              Why Us
-            </p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-theme-primary tracking-tight mb-4">
-              Built for Modern Job Hunters
-            </h2>
-            <p className="text-theme-muted max-w-md mx-auto">
-              Faster, smarter, and more transparent than any other platform.
-            </p>
+            <div>
+              <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">
+                Ace Your Interview
+              </p>
+              <h2 className="text-3xl font-extrabold text-theme-primary tracking-tight">
+                Interview Prep
+              </h2>
+              <p className="text-theme-muted text-sm mt-1">
+                Real questions with expert answers to help you land the job
+              </p>
+            </div>
+            <Link
+              to="/interview-questions"
+              className="hidden md:flex items-center gap-2 text-purple-400 hover:text-purple-300 border border-purple-500/30 hover:border-purple-500/60 px-4 py-2 rounded-xl transition text-sm font-medium"
+            >
+              See All <FiArrowUpRight className="w-4 h-4" />
+            </Link>
           </motion.div>
-
           <motion.div
             variants={stagger}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+            className="grid grid-cols-1 md:grid-cols-3 gap-4"
           >
-            {features.map((f, i) => (
+            {[
+              {
+                level: "Beginner",
+                color:
+                  "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+                emoji: "💻",
+                q: "What is the difference between var, let, and const in JavaScript?",
+              },
+              {
+                level: "Common",
+                color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                emoji: "🤝",
+                q: "Tell me about yourself.",
+              },
+              {
+                level: "Intermediate",
+                color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+                emoji: "📊",
+                q: "How do you prioritize tasks when everything seems urgent?",
+              },
+            ].map((item, i) => (
+              <motion.div key={i} variants={scaleIn}>
+                <Link
+                  to="/interview-questions"
+                  className="group card-theme block border hover:border-purple-500/40 rounded-2xl p-6 transition-all duration-300 hover:bg-purple-500/[0.03]"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-2xl">{item.emoji}</span>
+                    <span
+                      className={`text-xs font-semibold px-2.5 py-1 rounded-lg border ${item.color}`}
+                    >
+                      {item.level}
+                    </span>
+                  </div>
+                  <p className="text-theme-primary font-semibold text-sm leading-relaxed group-hover:text-purple-400 transition mb-4">
+                    {item.q}
+                  </p>
+                  <span className="text-xs text-theme-muted group-hover:text-purple-400 transition flex items-center gap-1 font-medium">
+                    View Answer <FiArrowUpRight className="w-3.5 h-3.5" />
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+          <div className="text-center mt-6 md:hidden">
+            <Link
+              to="/interview-questions"
+              className="text-purple-400 hover:text-purple-300 transition text-sm font-medium"
+            >
+              See all questions →
+            </Link>
+          </div>
+        </div>
+      </section>
+      {/* ══ FEATURES ══════════════════════════════════════════════════ */}
+      <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">
+              Why Us
+            </p>
+            <h2 className="text-3xl font-extrabold text-theme-primary tracking-tight mb-3">
+              Built for Modern Job Hunters
+            </h2>
+            <p className="text-theme-muted max-w-md mx-auto text-sm">
+              Faster, smarter, and more transparent than any other platform.
+            </p>
+          </motion.div>
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          >
+            {[
+              {
+                icon: <FaBrain className="w-5 h-5" />,
+                title: "AI-Powered Matching",
+                desc: "Smart algorithm matches your skills with the perfect opportunities in real time.",
+                accent: "from-violet-500 to-purple-700",
+              },
+              {
+                icon: <FaChartLine className="w-5 h-5" />,
+                title: "Real-time Tracking",
+                desc: "Track your application status live — from Applied to Hired instantly.",
+                accent: "from-blue-500 to-cyan-600",
+              },
+              {
+                icon: <FaRocket className="w-5 h-5" />,
+                title: "Fast Applications",
+                desc: "One-click apply with your saved CV. No repetitive form filling.",
+                accent: "from-rose-500 to-pink-700",
+              },
+              {
+                icon: <FaShieldAlt className="w-5 h-5" />,
+                title: "Verified Companies",
+                desc: "Every employer is verified to ensure safe, legitimate listings.",
+                accent: "from-emerald-500 to-teal-700",
+              },
+            ].map((f, i) => (
               <motion.div
                 key={i}
                 variants={scaleIn}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
                 className="card-theme border hover:border-purple-500/30 rounded-2xl p-6 transition-all duration-300 group"
               >
                 <div
-                  className={`w-11 h-11 bg-gradient-to-br ${f.accent} rounded-xl flex items-center justify-center text-white mb-5 shadow-lg ${f.glow} group-hover:scale-110 transition-transform duration-300`}
+                  className={`w-10 h-10 bg-gradient-to-br ${f.accent} rounded-xl flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}
                 >
                   {f.icon}
                 </div>
@@ -676,28 +953,56 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* ══ HOW IT WORKS ═══════════════════════════════════════ */}
-      <section className="py-24 px-6 bg-theme-secondary">
+      {/* ══ TESTIMONIALS CAROUSEL ════════════════════════════════════ */}
+      <section className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">
+              Success Stories
+            </p>
+            <h2 className="text-3xl font-extrabold text-theme-primary tracking-tight">
+              What Our Users Say
+            </h2>
+            <p className="text-theme-muted text-sm mt-2">
+              Real experiences from real job seekers
+            </p>
+          </motion.div>
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <TestimonialCarousel />
+          </motion.div>
+        </div>
+      </section>
+      {/* ══ HOW IT WORKS ══════════════════════════════════════════════ */}
+      <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
         <div className="max-w-4xl mx-auto">
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">
+            <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">
               Simple Process
             </p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-theme-primary tracking-tight mb-4">
+            <h2 className="text-3xl font-extrabold text-theme-primary tracking-tight mb-3">
               Get Hired in 3 Steps
             </h2>
-            <p className="text-theme-muted">
+            <p className="text-theme-muted text-sm">
               From signup to offer letter — we make it effortless
             </p>
           </motion.div>
-
           <motion.div
             variants={stagger}
             initial="hidden"
@@ -709,7 +1014,7 @@ const Home = () => {
               {
                 step: "01",
                 title: "Create Your Profile",
-                desc: "Sign up and build your professional profile with skills, experience, and upload your CV in minutes.",
+                desc: "Sign up and build your professional profile with skills, experience, and upload your CV.",
                 icon: <FiUsers className="w-5 h-5" />,
               },
               {
@@ -721,7 +1026,7 @@ const Home = () => {
               {
                 step: "03",
                 title: "Get Hired",
-                desc: "Track your application live and get notified the moment employers respond to you.",
+                desc: "Track your application live and get notified the moment employers respond.",
                 icon: <FaBriefcase className="w-5 h-5" />,
               },
             ].map((item, i) => (
@@ -754,76 +1059,148 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* ══ CTA ════════════════════════════════════════════════ */}
-      <section className="py-24 px-6">
-        <div className="max-w-4xl mx-auto">
+      {/* ══ APP DOWNLOAD — light/dark mode fixed ═══════════════════════ */}
+      <section className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="relative bg-gradient-to-br from-violet-900/30 via-purple-900/20 to-blue-900/30 border border-purple-500/20 rounded-3xl p-12 md:p-16 text-center overflow-hidden"
+            className="card-theme border border-purple-500/20 rounded-3xl p-10 md:p-12 overflow-hidden relative"
           >
-            {/* BG effects */}
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-64 bg-purple-600 opacity-[0.15] rounded-full blur-3xl" />
-              <div className="absolute bottom-0 right-0 w-48 h-48 bg-blue-600 opacity-[0.1] rounded-full blur-2xl" />
+            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/8 rounded-full blur-3xl" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/8 rounded-full blur-2xl" />
               <div
-                className="absolute inset-0 opacity-[0.02]"
+                className="absolute inset-0 opacity-[0.015]"
                 style={{
                   backgroundImage:
-                    "radial-gradient(currentColor 1px, transparent 1px)",
-                  backgroundSize: "24px 24px",
+                    "radial-gradient(currentColor 1px,transparent 1px)",
+                  backgroundSize: "20px 20px",
                 }}
               />
             </div>
 
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/25 text-purple-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 uppercase tracking-wider">
-                <FaRocket className="w-3 h-3" /> Join Thousands of Professionals
+            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-5 uppercase tracking-wider">
+                  <FaRocket className="w-3 h-3" /> Mobile App
+                </div>
+                <h2 className="text-3xl font-extrabold text-theme-primary tracking-tight mb-3">
+                  Download{" "}
+                  <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+                    Our App
+                  </span>{" "}
+                  Now!
+                </h2>
+                <p className="text-theme-muted text-sm mb-7 leading-relaxed">
+                  Find jobs on the go. Get instant notifications, apply with one
+                  tap, and manage your career from your pocket.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {[
+                    {
+                      icon: <FaAppStore className="w-5 h-5 text-purple-400" />,
+                      top: "Download on the",
+                      bottom: "App Store",
+                    },
+                    {
+                      icon: (
+                        <FaGooglePlay className="w-5 h-5 text-purple-400" />
+                      ),
+                      top: "Get it on",
+                      bottom: "Google Play",
+                    },
+                  ].map((btn, i) => (
+                    <button
+                      key={i}
+                      className="flex items-center gap-3 card-theme border hover:border-purple-500/40 hover:bg-purple-500/5 px-5 py-3 rounded-xl transition"
+                    >
+                      {btn.icon}
+                      <div className="text-left">
+                        <p className="text-[10px] text-theme-muted">
+                          {btn.top}
+                        </p>
+                        <p className="text-sm font-bold text-theme-primary">
+                          {btn.bottom}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <h2 className="text-4xl md:text-5xl font-extrabold text-theme-primary tracking-tight mb-4">
-                Ready to Start?
-              </h2>
-              <p className="text-theme-muted mb-10 max-w-lg mx-auto leading-relaxed">
-                Join job seekers who found their perfect career through
-                JobPortal. Free to get started — no credit card required.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/register"
-                  className="group bg-gradient-to-r from-violet-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:opacity-95 transition shadow-xl shadow-purple-900/30 flex items-center justify-center gap-2"
-                >
-                  Get Started Free
-                  <FaArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-                <Link
-                  to="/jobs"
-                  className="border border-theme text-theme-secondary hover:text-theme-primary hover:border-purple-500/40 px-8 py-4 rounded-xl font-semibold transition flex items-center justify-center gap-2"
-                >
-                  Browse Jobs
-                </Link>
+              <div className="hidden md:grid grid-cols-3 gap-3">
+                {[
+                  { label: "5★", sub: "App Rating", emoji: "⭐" },
+                  { label: "50k+", sub: "Downloads", emoji: "📥" },
+                  { label: "Free", sub: "Forever Plan", emoji: "🎉" },
+                ].map((s, i) => (
+                  <div
+                    key={i}
+                    className="card-theme border border-purple-500/10 rounded-2xl p-5 text-center"
+                  >
+                    <span className="text-2xl mb-2 block">{s.emoji}</span>
+                    <p className="text-xl font-extrabold text-theme-primary">
+                      {s.label}
+                    </p>
+                    <p className="text-theme-muted text-xs mt-1">{s.sub}</p>
+                  </div>
+                ))}
               </div>
-
-              {/* Small trust line */}
-              <p className="text-theme-muted text-xs mt-8 flex items-center justify-center gap-4 flex-wrap">
-                <span className="flex items-center gap-1">
-                  <FiCheckCircle className="text-emerald-400 w-3.5 h-3.5" /> No
-                  credit card
-                </span>
-                <span className="flex items-center gap-1">
-                  <FiCheckCircle className="text-emerald-400 w-3.5 h-3.5" />{" "}
-                  Free forever plan
-                </span>
-                <span className="flex items-center gap-1">
-                  <FiCheckCircle className="text-emerald-400 w-3.5 h-3.5" />{" "}
-                  Cancel anytime
-                </span>
-              </p>
             </div>
+          </motion.div>
+        </div>
+      </section>
+      {/* ══ CTA ═══════════════════════════════════════════════════════ */}
+      <section className="py-16 px-6 bg-theme-secondary border-t border-theme">
+        <div className="max-w-3xl mx-auto text-center">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/25 text-purple-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 uppercase tracking-wider">
+              <FaRocket className="w-3 h-3" /> Join Thousands of Professionals
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-theme-primary tracking-tight mb-4">
+              Looking for Your Ideal Job?
+            </h2>
+            <p className="text-theme-muted mb-8 max-w-lg mx-auto leading-relaxed text-sm">
+              Join job seekers who found their perfect career. Free to get
+              started — no credit card required.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/register"
+                className="group bg-gradient-to-r from-violet-600 to-blue-600 text-white px-8 py-3.5 rounded-xl font-semibold hover:opacity-95 transition shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+              >
+                Sign Up Now{" "}
+                <FaArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              <Link
+                to="/jobs"
+                className="border border-theme text-theme-secondary hover:text-theme-primary hover:border-purple-500/40 px-8 py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2"
+              >
+                Browse Jobs
+              </Link>
+            </div>
+            <p className="text-theme-muted text-xs mt-6 flex items-center justify-center gap-5 flex-wrap">
+              <span className="flex items-center gap-1">
+                <FiCheckCircle className="text-emerald-400 w-3.5 h-3.5" /> No
+                credit card
+              </span>
+              <span className="flex items-center gap-1">
+                <FiCheckCircle className="text-emerald-400 w-3.5 h-3.5" /> Free
+                forever plan
+              </span>
+              <span className="flex items-center gap-1">
+                <FiCheckCircle className="text-emerald-400 w-3.5 h-3.5" />{" "}
+                Cancel anytime
+              </span>
+            </p>
           </motion.div>
         </div>
       </section>

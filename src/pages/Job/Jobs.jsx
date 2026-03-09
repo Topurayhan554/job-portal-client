@@ -365,7 +365,7 @@ const Jobs = () => {
     } catch {
       toast.error("Failed to load jobs");
     } finally {
-      setLoading(false);apply
+      setLoading(false);
     }
   }, [
     search,

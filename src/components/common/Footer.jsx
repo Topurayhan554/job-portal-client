@@ -44,34 +44,6 @@ const Footer = () => {
 
   return (
     <footer className="bg-theme-secondary border-t border-theme">
-      {/*  Top CTA Banner  */}
-      <div className="border-b border-theme">
-        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="text-theme-primary font-bold text-lg">
-              Ready to find your next opportunity?
-            </p>
-            <p className="text-theme-muted text-sm mt-0.5">
-              Join thousands of professionals already on KaajKhojo.
-            </p>
-          </div>
-          <div className="flex gap-3 flex-shrink-0">
-            <Link
-              to="/jobs"
-              className="text-sm font-semibold text-theme-secondary border border-theme px-5 py-2.5 rounded-xl hover:border-purple-500/40 hover:text-theme-primary transition"
-            >
-              Browse Jobs
-            </Link>
-            <Link
-              to="/register"
-              className="text-sm font-semibold bg-gradient-to-r from-violet-600 to-blue-600 text-white px-5 py-2.5 rounded-xl hover:opacity-90 transition shadow-lg shadow-purple-900/20 flex items-center gap-2"
-            >
-              Get Started <FiArrowUpRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
       {/*  Main Footer  */}
       <div className="max-w-7xl mx-auto px-6 py-14">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">

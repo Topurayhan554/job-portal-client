@@ -12,7 +12,7 @@ import {
   FiCheckCircle,
   FiImage,
 } from "react-icons/fi";
-
+import { FaBriefcase } from "react-icons/fa";
 import toast from "react-hot-toast";
 import axios from "axios";
 import useAuth from "../../hooks/useAuth";
@@ -36,7 +36,6 @@ const Register = () => {
 
   const watchPassword = watch("password", "");
 
-  // Password strength
   const getStrength = () => {
     const hasUpper = /[A-Z]/.test(watchPassword);
     const hasLower = /[a-z]/.test(watchPassword);
@@ -47,16 +46,14 @@ const Register = () => {
     ).length;
     return { score, hasUpper, hasLower, hasNumber, hasMinLength };
   };
-
   const strength = getStrength();
 
   const strengthColor = () => {
-    if (strength.score === 0) return "bg-gray-700";
+    if (strength.score === 0) return "bg-gray-300 dark:bg-gray-700";
     if (strength.score <= 2) return "bg-red-500";
     if (strength.score === 3) return "bg-yellow-500";
     return "bg-green-500";
   };
-
   const strengthText = () => {
     if (strength.score === 0) return "";
     if (strength.score <= 2) return "Weak";
@@ -64,7 +61,6 @@ const Register = () => {
     return "Strong";
   };
 
-  // Photo preview
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -74,7 +70,6 @@ const Register = () => {
     }
   };
 
-  // imgbb photo upload
   const uploadToImgbb = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -85,7 +80,6 @@ const Register = () => {
     return res.data.data.url;
   };
 
-  // DB User save
   const saveUserToDB = async (firebaseUser, extraData = {}) => {
     try {
       await api.post("/users", {
@@ -97,50 +91,37 @@ const Register = () => {
         role: extraData.role || "seeker",
       });
     } catch (error) {
-      if (error.response?.status !== 409) {
+      if (error.response?.status !== 409)
         console.error("Save user error:", error);
-      }
     }
   };
 
   const handleRegister = async (data) => {
     try {
       const profileImg = data.photo?.[0];
-
-      // 1. Firebase signup
       const userCredential = await signUpFunc(data.email, data.password);
       const firebaseUser = userCredential.user;
-
-      // 2. imgbb photo upload
       let photoURL = "";
       if (profileImg) {
         try {
           photoURL = await uploadToImgbb(profileImg);
-        } catch (err) {
-          console.error("Photo upload failed:", err);
+        } catch {
           toast.error("Photo upload failed, continuing without photo");
         }
       }
-
-      // 3. Firebase profile update
       await updateUserProfile({
         displayName: data.name,
         photoURL: photoURL || "",
       });
-
-      // 4. DB save
       await saveUserToDB(
         { ...firebaseUser, displayName: data.name, photoURL },
         { name: data.name, phone: data.phone || "", role: data.role },
       );
-
-      // 5. Sync
       await syncUserWithDatabase({
         ...firebaseUser,
         displayName: data.name,
         photoURL,
       });
-
       toast.success("Account created successfully! 🎉");
       navigate(location?.state || "/");
     } catch (error) {
@@ -160,102 +141,186 @@ const Register = () => {
       await signInGoogle();
       toast.success("Logged in with Google!");
       navigate(location?.state || "/");
-    } catch (error) {
+    } catch {
       toast.error("Google login failed. Try again.");
     }
   };
 
+  // ── input class — theme-aware ──
   const inputClass = (error) =>
-    `w-full bg-[#12121f] border rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${
-      error ? "border-red-500" : "border-gray-700"
+    `w-full input-theme border rounded-xl pl-11 pr-4 py-3 text-theme-primary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${
+      error ? "border-red-500" : "border-theme"
     }`;
 
+  const stats = [
+    { value: "10,000+", label: "Active Jobs" },
+    { value: "25,000+", label: "Job Seekers" },
+    { value: "1,500+", label: "Top Companies" },
+  ];
+  const features = [
+    {
+      emoji: "🤖",
+      title: "AI-Powered Matching",
+      desc: "Get matched to jobs that fit your exact skills and experience.",
+    },
+    {
+      emoji: "📊",
+      title: "Smart CV Analyzer",
+      desc: "Instantly see how your resume scores against job requirements.",
+    },
+    {
+      emoji: "🔔",
+      title: "Real-Time Alerts",
+      desc: "Be the first to know when a perfect job opens up for you.",
+    },
+    {
+      emoji: "✅",
+      title: "Verified Employers Only",
+      desc: "Every company is vetted — no spam, no fake listings.",
+    },
+  ];
+
   return (
-    <div className="min-h-screen flex bg-[#0a0a14]">
-      {/* Left Side */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#1a1040] via-[#0f0f2d] to-[#0a0a14] flex-col items-center justify-center px-16 relative overflow-hidden">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-600 opacity-20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-60 h-60 bg-blue-600 opacity-20 rounded-full blur-3xl"></div>
-        <div className="relative z-10 text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-3xl flex items-center justify-center shadow-2xl mx-auto mb-8">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-10 h-10 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <span className="text-xl font-bold text-white">
-            Kaaj<span className="text-purple-400">Khojo</span>
-          </span>{" "}
-          <p className="text-gray-400 text-lg leading-relaxed max-w-sm">
-            Start your journey today. Thousands of opportunities are waiting for
-            you.
-          </p>
-          <div className="mt-12 space-y-4 text-left">
-            {[
-              "AI-powered job matching",
-              "Real-time application tracking",
-              "Smart resume analyzer",
-            ].map((f, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-6 h-6 bg-purple-500/20 border border-purple-500/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-3 h-3 text-purple-400"
+    <div className="min-h-screen flex bg-theme-primary">
+      {/* ══════════════════════════
+          LEFT — always dark
+      ══════════════════════════ */}
+      <div className="hidden lg:flex w-[52%] relative overflow-hidden flex-col">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0d0820] via-[#100b2e] to-[#07071a]" />
+        <div className="absolute top-[-80px] left-[-80px]   w-[420px] h-[420px] bg-violet-700 opacity-[0.18] rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-60px] right-[-40px] w-[360px] h-[360px] bg-blue-600  opacity-[0.15] rounded-full blur-[90px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-purple-800 opacity-[0.08] rounded-full blur-[80px]" />
+        <div
+          className="absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, #a78bfa 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+        <div className="absolute top-0 right-28 w-px h-full bg-gradient-to-b from-transparent via-purple-500/20 to-transparent" />
+        <div className="absolute top-0 right-56 w-px h-full bg-gradient-to-b from-transparent via-blue-500/10  to-transparent" />
+
+        <div className="relative z-10 flex flex-col h-full px-14 py-12">
+          <Link to="/" className="flex items-center gap-3 group w-fit">
+            <div className="w-11 h-11 bg-gradient-to-br from-violet-600 to-blue-600 rounded-xl flex items-center justify-center shadow-xl shadow-purple-900/40 group-hover:scale-110 transition-transform">
+              <FaBriefcase className="text-white w-5 h-5" />
+            </div>
+            <span className="text-2xl font-extrabold text-white tracking-tight">
+              Kaaj<span className="text-purple-400">Khojo</span>
+            </span>
+          </Link>
+
+          <div className="mt-auto mb-auto pt-12">
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 uppercase tracking-widest">
+              🇧🇩 Bangladesh's #1 Job Platform
+            </div>
+            <h1 className="text-4xl font-extrabold text-white leading-tight tracking-tight mb-4">
+              Your next big
+              <br />
+              <span className="relative">
+                <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  career move
+                </span>
+                <svg
+                  className="absolute -bottom-2 left-0 w-full"
+                  height="6"
+                  viewBox="0 0 200 6"
+                  fill="none"
+                >
+                  <path
+                    d="M0 5 Q50 0 100 4 Q150 8 200 3"
+                    stroke="url(#ul)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
                     fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+                  />
+                  <defs>
+                    <linearGradient
+                      id="ul"
+                      x1="0"
+                      y1="0"
+                      x2="200"
+                      y2="0"
+                      gradientUnits="userSpaceOnUse"
+                    >
+                      <stop stopColor="#7c3aed" />
+                      <stop offset="1" stopColor="#3b82f6" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </span>
+              <br />
+              starts here.
+            </h1>
+            <p className="text-gray-400 text-base leading-relaxed max-w-xs mt-6">
+              Join thousands of professionals who found their dream job through
+              KaajKhojo — built for Bangladesh.
+            </p>
+            <div className="flex gap-6 mt-8">
+              {stats.map((s, i) => (
+                <div key={i}>
+                  <p className="text-white text-xl font-extrabold">{s.value}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{s.label}</p>
                 </div>
-                <span className="text-gray-300">{f}</span>
+              ))}
+            </div>
+            <div className="mt-10 grid grid-cols-2 gap-3">
+              {features.map((f, i) => (
+                <div
+                  key={i}
+                  className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4 hover:bg-white/[0.06] hover:border-purple-500/20 transition"
+                >
+                  <div className="text-xl mb-2">{f.emoji}</div>
+                  <p className="text-white text-xs font-semibold mb-1">
+                    {f.title}
+                  </p>
+                  <p className="text-gray-500 text-[11px] leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-auto border-t border-white/[0.06] pt-6">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                R
               </div>
-            ))}
+              <div>
+                <p className="text-gray-300 text-xs leading-relaxed italic">
+                  "Found my dream job within 2 weeks of signing up. The AI
+                  matching is incredibly accurate."
+                </p>
+                <p className="text-gray-500 text-xs mt-1.5 font-medium">
+                  Rahim — Software Engineer, Dhaka
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Right Side */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 overflow-y-auto">
+      {/* ══════════════════════════
+          RIGHT — light/dark aware
+      ══════════════════════════ */}
+      <div className="w-full lg:w-[48%] flex items-center justify-center px-6 py-12 overflow-y-auto bg-theme-primary">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="flex lg:hidden items-center gap-3 mb-8 justify-center">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
+              <FaBriefcase className="text-white w-5 h-5" />
             </div>
-            <span className="text-2xl font-bold text-white">JobPortal</span>
+            <span className="text-2xl font-bold text-theme-primary">
+              Kaaj<span className="text-purple-500">Khojo</span>
+            </span>
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-2">Create account</h2>
-          <p className="text-gray-400 mb-6">
+          <h2 className="text-3xl font-bold text-theme-primary mb-2">
+            Create account
+          </h2>
+          <p className="text-theme-muted mb-6">
             Join thousands of job seekers and employers
           </p>
 
@@ -263,7 +328,7 @@ const Register = () => {
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-[#1e1e30] border border-gray-700 text-white py-3 rounded-xl hover:bg-[#252540] hover:border-gray-500 transition mb-5 font-medium"
+            className="w-full flex items-center justify-center gap-3 card-theme border border-theme text-theme-primary py-3 rounded-xl hover:border-purple-500/40 transition mb-5 font-medium"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -288,21 +353,21 @@ const Register = () => {
 
           {/* Divider */}
           <div className="flex items-center gap-4 mb-5">
-            <div className="flex-1 h-px bg-gray-700"></div>
-            <span className="text-gray-500 text-sm">
+            <div className="flex-1 h-px bg-theme-muted/30" />
+            <span className="text-theme-muted text-sm">
               Or continue with email
             </span>
-            <div className="flex-1 h-px bg-gray-700"></div>
+            <div className="flex-1 h-px bg-theme-muted/30" />
           </div>
 
           <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-theme-secondary mb-2">
                 Full Name
               </label>
               <div className="relative">
-                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Enter your full name"
@@ -318,7 +383,7 @@ const Register = () => {
                 />
               </div>
               {errors.name && (
-                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <FiAlertCircle className="w-4 h-4" /> {errors.name.message}
                 </p>
               )}
@@ -326,11 +391,11 @@ const Register = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-theme-secondary mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
                 <input
                   type="email"
                   placeholder="Enter your email"
@@ -346,7 +411,7 @@ const Register = () => {
                 />
               </div>
               {errors.email && (
-                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <FiAlertCircle className="w-4 h-4" /> {errors.email.message}
                 </p>
               )}
@@ -354,11 +419,12 @@ const Register = () => {
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Phone Number <span className="text-gray-500">(Optional)</span>
+              <label className="block text-sm font-medium text-theme-secondary mb-2">
+                Phone Number{" "}
+                <span className="text-theme-muted font-normal">(Optional)</span>
               </label>
               <div className="relative">
-                <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
                 <input
                   type="tel"
                   placeholder="01XXXXXXXXX"
@@ -373,7 +439,7 @@ const Register = () => {
                 />
               </div>
               {errors.phone && (
-                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <FiAlertCircle className="w-4 h-4" /> {errors.phone.message}
                 </p>
               )}
@@ -381,12 +447,12 @@ const Register = () => {
 
             {/* Photo Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Profile Photo <span className="text-gray-500">(Optional)</span>
+              <label className="block text-sm font-medium text-theme-secondary mb-2">
+                Profile Photo{" "}
+                <span className="text-theme-muted font-normal">(Optional)</span>
               </label>
               <div className="flex items-center gap-4">
-                {/* Preview */}
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#12121f] border border-gray-700 flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-xl overflow-hidden input-theme border border-theme flex items-center justify-center flex-shrink-0">
                   {photoPreview ? (
                     <img
                       src={photoPreview}
@@ -394,15 +460,13 @@ const Register = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <FiUser className="w-6 h-6 text-gray-500" />
+                    <FiUser className="w-6 h-6 text-theme-muted" />
                   )}
                 </div>
-
-                {/* Upload Button */}
                 <label className="flex-1 cursor-pointer">
-                  <div className="flex items-center gap-2 bg-[#12121f] border border-gray-700 border-dashed rounded-xl px-4 py-3 hover:border-purple-500 hover:bg-purple-500/5 transition">
-                    <FiImage className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-400 text-sm">
+                  <div className="flex items-center gap-2 input-theme border border-theme border-dashed rounded-xl px-4 py-3 hover:border-purple-500 hover:bg-purple-500/5 transition">
+                    <FiImage className="w-4 h-4 text-theme-muted" />
+                    <span className="text-theme-muted text-sm">
                       {photoPreview ? "Change photo" : "Upload photo"}
                     </span>
                   </div>
@@ -422,11 +486,11 @@ const Register = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-theme-secondary mb-2">
                 Password
               </label>
               <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
@@ -444,12 +508,12 @@ const Register = () => {
                         /[a-z]/.test(v) || "Must contain a lowercase letter",
                     },
                   })}
-                  className={`w-full bg-[#12121f] border rounded-xl pl-11 pr-12 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.password ? "border-red-500" : "border-gray-700"}`}
+                  className={`w-full input-theme border rounded-xl pl-11 pr-12 py-3 text-theme-primary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.password ? "border-red-500" : "border-theme"}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted hover:text-theme-primary transition"
                 >
                   {showPassword ? (
                     <FiEyeOff className="w-4 h-4" />
@@ -459,17 +523,16 @@ const Register = () => {
                 </button>
               </div>
 
-              {/* Password Strength */}
               {watchPassword && (
                 <div className="mt-2">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-theme-secondary rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all duration-300 ${strengthColor()}`}
                         style={{ width: `${(strength.score / 4) * 100}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-400 font-medium">
+                    <span className="text-xs text-theme-muted font-medium">
                       {strengthText()}
                     </span>
                   </div>
@@ -490,7 +553,7 @@ const Register = () => {
                     ].map((item, i) => (
                       <div
                         key={i}
-                        className={`flex items-center gap-2 text-xs ${item.check ? "text-green-400" : "text-gray-500"}`}
+                        className={`flex items-center gap-2 text-xs ${item.check ? "text-green-500" : "text-theme-muted"}`}
                       >
                         <FiCheckCircle className="w-3 h-3" />
                         <span>{item.text}</span>
@@ -500,7 +563,7 @@ const Register = () => {
                 </div>
               )}
               {errors.password && (
-                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <FiAlertCircle className="w-4 h-4" />{" "}
                   {errors.password.message}
                 </p>
@@ -509,11 +572,11 @@ const Register = () => {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-theme-secondary mb-2">
                 Confirm Password
               </label>
               <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted w-4 h-4" />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
@@ -523,12 +586,12 @@ const Register = () => {
                     validate: (value) =>
                       value === watchPassword || "Passwords do not match",
                   })}
-                  className={`w-full bg-[#12121f] border rounded-xl pl-11 pr-12 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.confirmPassword ? "border-red-500" : "border-gray-700"}`}
+                  className={`w-full input-theme border rounded-xl pl-11 pr-12 py-3 text-theme-primary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.confirmPassword ? "border-red-500" : "border-theme"}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted hover:text-theme-primary transition"
                 >
                   {showConfirmPassword ? (
                     <FiEyeOff className="w-4 h-4" />
@@ -538,7 +601,7 @@ const Register = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <FiAlertCircle className="w-4 h-4" />{" "}
                   {errors.confirmPassword.message}
                 </p>
@@ -547,7 +610,7 @@ const Register = () => {
 
             {/* Role */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-theme-secondary mb-2">
                 I am a
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -558,7 +621,7 @@ const Register = () => {
                     {...register("role")}
                     className="peer sr-only"
                   />
-                  <div className="flex items-center justify-center gap-2 border border-gray-700 rounded-xl py-3 text-gray-400 peer-checked:border-purple-500 peer-checked:text-purple-400 peer-checked:bg-purple-500/10 hover:border-gray-500 transition">
+                  <div className="flex items-center justify-center gap-2 border border-theme rounded-xl py-3 text-theme-muted peer-checked:border-purple-500 peer-checked:text-purple-500 peer-checked:bg-purple-500/10 hover:border-purple-500/40 transition">
                     <FiUser className="w-4 h-4" /> Job Seeker
                   </div>
                 </label>
@@ -569,22 +632,8 @@ const Register = () => {
                     {...register("role")}
                     className="peer sr-only"
                   />
-                  <div className="flex items-center justify-center gap-2 border border-gray-700 rounded-xl py-3 text-gray-400 peer-checked:border-purple-500 peer-checked:text-purple-400 peer-checked:bg-purple-500/10 hover:border-gray-500 transition">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                      />
-                    </svg>
-                    Employer
+                  <div className="flex items-center justify-center gap-2 border border-theme rounded-xl py-3 text-theme-muted peer-checked:border-purple-500 peer-checked:text-purple-500 peer-checked:bg-purple-500/10 hover:border-purple-500/40 transition">
+                    <FaBriefcase className="w-4 h-4" /> Employer
                   </div>
                 </label>
               </div>
@@ -593,7 +642,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 transition shadow-lg shadow-purple-900/30"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 transition shadow-lg shadow-purple-900/20"
             >
               {isSubmitting ? (
                 <>
@@ -624,22 +673,22 @@ const Register = () => {
             </button>
           </form>
 
-          <p className="text-center text-gray-500 mt-6 text-sm">
+          <p className="text-center text-theme-muted mt-6 text-sm">
             Already have an account?{" "}
             <Link
               to="/login"
-              className="text-purple-400 font-semibold hover:text-purple-300 transition"
+              className="text-purple-500 font-semibold hover:text-purple-400 transition"
             >
               Sign in
             </Link>
           </p>
-          <p className="text-center text-gray-600 text-xs mt-4 pb-4">
+          <p className="text-center text-theme-muted text-xs mt-4 pb-4">
             By registering, you agree to our{" "}
-            <span className="text-gray-500 hover:text-white cursor-pointer transition">
+            <span className="hover:text-theme-primary cursor-pointer transition">
               Terms of Service
             </span>{" "}
             and{" "}
-            <span className="text-gray-500 hover:text-white cursor-pointer transition">
+            <span className="hover:text-theme-primary cursor-pointer transition">
               Privacy Policy
             </span>
           </p>
