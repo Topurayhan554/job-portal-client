@@ -24,61 +24,7 @@ import {
 import useAuth from "../hooks/useAuth";
 import useNotifications from "../hooks/useNotifications";
 import toast from "react-hot-toast";
-
-//  Sidebar Links
-const sidebarLinks = {
-  seeker: [
-    { label: "Dashboard", path: "/seeker/dashboard", icon: <FiHome /> },
-    { label: "Profile", path: "/seeker/profile", icon: <FiUser /> },
-    { label: "Messages", path: "/seeker/messages", icon: <FiMessageSquare /> },
-    {
-      label: "Applied Jobs",
-      path: "/seeker/applications",
-      icon: <FiFileText />,
-    },
-    { label: "Find Jobs", path: "/jobs", icon: <FiSearch /> },
-    { label: "Saved Jobs", path: "/seeker/saved", icon: <FiBookmark /> },
-    { label: "Recommended", path: "/seeker/recommended", icon: <FiStar /> },
-    { label: "CV Manager", path: "/seeker/cv", icon: <FiFile /> },
-
-    { label: "Profile Views", path: "/seeker/views", icon: <FiEye /> },
-    { label: "Notifications", path: "/seeker/notifications", icon: <FiBell /> },
-    { label: "Settings", path: "/seeker/settings", icon: <FiSettings /> },
-  ],
-  employer: [
-    { label: "Dashboard", path: "/employer/dashboard", icon: <FiHome /> },
-    { label: "Profile", path: "/employer/profile", icon: <FiUser /> },
-    { label: "Post a Job", path: "/employer/post-job", icon: <FiPlusCircle /> },
-    { label: "My Jobs", path: "/employer/jobs", icon: <FaBriefcase /> },
-    { label: "Applicants", path: "/employer/applicants", icon: <FiUsers /> },
-    {
-      label: "Messages",
-      path: "/employer/messages",
-      icon: <FiMessageSquare />,
-    },
-    {
-      label: "Notifications",
-      path: "/employer/notifications",
-      icon: <FiBell />,
-    },
-    { label: "Settings", path: "/employer/settings", icon: <FiSettings /> },
-  ],
-  admin: [
-    { label: "Dashboard", path: "/admin/dashboard", icon: <FiGrid /> },
-    { label: "Profile", path: "/admin/profile", icon: <FiUser /> },
-    { label: "Manage Users", path: "/admin/users", icon: <FiUsers /> },
-    { label: "Manage Jobs", path: "/admin/jobs", icon: <FiClipboard /> },
-    {
-      label: "Applications",
-      path: "/admin/applications",
-      icon: <FiFileText />,
-    },
-    { label: "Messages", path: "/admin/messages", icon: <FiMessageSquare /> },
-    { label: "Notifications", path: "/admin/notifications", icon: <FiBell /> },
-    { label: "Settings", path: "/admin/settings", icon: <FiSettings /> },
-    { label: "Security", path: "/admin/security", icon: <FiShield /> },
-  ],
-};
+import { sidebarLinks } from "../../public/data";
 
 //  Profile Completion
 const calcProfileComplete = (user) => {

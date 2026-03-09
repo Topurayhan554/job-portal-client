@@ -25,8 +25,17 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 import api from "../services/api";
+import {
+  interviewquestions,
+  jobhunters,
+  partnerLogos,
+  testimonials,
+} from "../../public/data";
+import JobCardSkeleton from "./common/JobCardSkeleton";
+import LogoCarousel from "./common/LogoCarousel";
+import TestimonialCarousel from "./common/TestimonialCarousel";
 
-// ── Animations ──
+//  Animations
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: {
@@ -68,69 +77,6 @@ const popularTags = [
   "Full-time",
 ];
 
-const partnerLogos = [
-  {
-    name: "bKash",
-    image: "/partners/bkash.png",
-    bg: "bg-pink-50    dark:bg-pink-950/40",
-    border: "border-pink-200    dark:border-pink-800/40",
-  },
-  {
-    name: "Pathao",
-    image: "/partners/pathao.png",
-    bg: "bg-orange-50  dark:bg-orange-950/40",
-    border: "border-orange-200  dark:border-orange-800/40",
-  },
-  {
-    name: "ShajGoj",
-    image: "/partners/shajgoj.png",
-    bg: "bg-teal-50    dark:bg-teal-950/40",
-    border: "border-teal-200    dark:border-teal-800/40",
-  },
-  {
-    name: "Chaldal",
-    image: "/partners/chaldal.png",
-    bg: "bg-green-50   dark:bg-green-950/40",
-    border: "border-green-200   dark:border-green-800/40",
-  },
-  {
-    name: "Shikho",
-    image: "/partners/shikho.png",
-    bg: "bg-violet-50  dark:bg-violet-950/40",
-    border: "border-violet-200  dark:border-violet-800/40",
-  },
-  {
-    name: "10 Minute School",
-    image: "/partners/10minuteschool.png",
-    bg: "bg-blue-50    dark:bg-blue-950/40",
-    border: "border-blue-200    dark:border-blue-800/40",
-  },
-  {
-    name: "Augmedix",
-    image: "/partners/augmedix.png",
-    bg: "bg-red-50     dark:bg-red-950/40",
-    border: "border-red-200     dark:border-red-800/40",
-  },
-  {
-    name: "CMED Health",
-    image: "/partners/CMDHealth.png",
-    bg: "bg-sky-50     dark:bg-sky-950/40",
-    border: "border-sky-200     dark:border-sky-800/40",
-  },
-  {
-    name: "Khaas Food",
-    image: "/partners/khaasfood.png",
-    bg: "bg-lime-50    dark:bg-lime-950/40",
-    border: "border-lime-200    dark:border-lime-800/40",
-  },
-  {
-    name: "Shohoz",
-    image: "/partners/shohoz.png",
-    bg: "bg-fuchsia-50 dark:bg-fuchsia-950/40",
-    border: "border-fuchsia-200 dark:border-fuchsia-800/40",
-  },
-];
-
 const quickLinks = [
   { label: "All Jobs (750+)", href: "/jobs" },
   { label: "Fresher Jobs (12)", href: "/jobs?experience=Entry Level" },
@@ -139,79 +85,7 @@ const quickLinks = [
   { label: "Remote Jobs (42)", href: "/jobs?type=Remote" },
 ];
 
-const testimonials = [
-  {
-    name: "Rafiq Ahmed",
-    role: "Software Engineer",
-    company: "Pathao",
-    text: "This platform is a complete help for the job market in Bangladesh. Found my dream job within 2 weeks of signing up. Highly recommended!",
-    avatar: "R",
-    color: "from-violet-600 to-blue-600",
-    rating: 5,
-    image: "/testimonials/rafiq.jpg",
-  },
-  {
-    name: "Nadia Islam",
-    role: "Product Designer",
-    company: "bKash",
-    text: "I got three job offers after registering here. The interview prep section was incredibly helpful and the company quality is outstanding.",
-    avatar: "N",
-    color: "from-pink-500 to-rose-500",
-    rating: 5,
-    image: "/testimonials/nadia.jpg",
-  },
-  {
-    name: "Mizanur Rahman",
-    role: "Marketing Manager",
-    company: "Shikho",
-    text: "As an experienced professional, I was skeptical — but the quality of listings here is genuinely better than anywhere else. Got hired in a month!",
-    avatar: "M",
-    color: "from-emerald-500 to-teal-500",
-    rating: 5,
-    image: "/testimonials/mizanur.jpg",
-  },
-  {
-    name: "Sadia Akter",
-    role: "HR Executive",
-    company: "Augmedix",
-    text: "The best job platform for Bangladesh. The filters are excellent and company verification gives real confidence. Highly recommend.",
-    avatar: "S",
-    color: "from-amber-500 to-orange-500",
-    rating: 5,
-    image: "/testimonials/sadia.jpg",
-  },
-  {
-    name: "Tanvir Hossain",
-    role: "Full Stack Developer",
-    company: "Chaldal",
-    text: "Applied to 5 jobs, got 3 interviews, accepted 1 amazing offer. The process was smooth and the platform is beautifully designed!",
-    avatar: "T",
-    color: "from-cyan-500 to-blue-500",
-    rating: 5,
-    image: "/testimonials/tanvir.jpg",
-  },
-];
-
-// ── Skeletons ──
-const JobCardSkeleton = () => (
-  <div className="card-theme border rounded-2xl p-5 animate-pulse">
-    <div className="flex items-start gap-3 mb-3">
-      <div className="w-10 h-10 bg-theme-primary/20 rounded-xl flex-shrink-0" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 bg-theme-primary/25 rounded w-3/4" />
-        <div className="h-3 bg-theme-primary/15 rounded w-1/2" />
-      </div>
-    </div>
-    <div className="flex gap-2 mb-3">
-      <div className="h-5 bg-theme-primary/15 rounded-full w-16" />
-      <div className="h-5 bg-theme-primary/15 rounded-full w-20" />
-    </div>
-    <div className="border-t border-theme pt-3 flex justify-between">
-      <div className="h-4 bg-theme-primary/20 rounded w-20" />
-      <div className="h-4 bg-theme-primary/15 rounded w-14" />
-    </div>
-  </div>
-);
+//  Skeletons
 
 const StatSkeleton = () => (
   <div className="animate-pulse card-theme border rounded-2xl p-4">
@@ -220,7 +94,7 @@ const StatSkeleton = () => (
   </div>
 );
 
-// ── Job Card ──
+//  Job Card
 const JobCard = ({ job }) => {
   const salary =
     job.salaryMin && job.salaryMax
@@ -291,155 +165,13 @@ const JobCard = ({ job }) => {
   );
 };
 
-// ── Infinite Logo Carousel ──
-const LogoCarousel = () => {
-  const doubled = [...partnerLogos, ...partnerLogos];
-  return (
-    <div className="relative overflow-hidden">
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-theme-secondary to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-theme-secondary to-transparent z-10 pointer-events-none" />
-      <motion.div
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        className="flex gap-4 w-max py-1"
-      >
-        {doubled.map((logo, i) => (
-          <div
-            key={i}
-            className={`flex-shrink-0 flex items-center justify-center h-16 w-40 rounded-2xl hover:-translate-y-1 transition-all duration-300 cursor-default`}
-          >
-            <img
-              src={logo.image}
-              alt={logo.name}
-              className="h-10 w-full object-contain"
-            />
-          </div>
-        ))}
-      </motion.div>
-    </div>
-  );
-};
+// Carousel
+<LogoCarousel />;
 
-// ── Testimonial Carousel ──
-const TestimonialCarousel = () => {
-  const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const timerRef = useRef(null);
-  const total = testimonials.length;
+//  Testimonial Carousel
+<TestimonialCarousel />;
 
-  const go = (dir) => {
-    setDirection(dir);
-    setCurrent((prev) => (prev + dir + total) % total);
-  };
-
-  useEffect(() => {
-    timerRef.current = setInterval(() => go(1), 4500);
-    return () => clearInterval(timerRef.current);
-  }, []);
-
-  const resetTimer = (dir) => {
-    clearInterval(timerRef.current);
-    go(dir);
-    timerRef.current = setInterval(() => go(1), 4500);
-  };
-
-  const visible = [0, 1, 2].map(
-    (offset) => testimonials[(current + offset) % total],
-  );
-
-  return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {visible.map((t, idx) => (
-          <motion.div
-            key={`${current}-${idx}`}
-            initial={{ opacity: 0, x: direction * 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-              duration: 0.42,
-              delay: idx * 0.07,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className={`card-theme border rounded-2xl p-6 transition-all duration-300
-              ${idx === 0 ? "border-purple-500/30 shadow-lg shadow-purple-500/5" : ""}
-              ${idx > 0 ? "hidden md:block" : ""}`}
-          >
-            <div className="flex gap-0.5 mb-3">
-              {Array.from({ length: t.rating }).map((_, i) => (
-                <FaStar
-                  key={i}
-                  className="w-3 h-3 text-amber-400 fill-current"
-                />
-              ))}
-            </div>
-            <FaQuoteLeft className="text-purple-500/20 w-6 h-6 mb-3" />
-            <p className="text-theme-secondary text-sm leading-relaxed mb-5">
-              "{t.text}"
-            </p>
-            <div className="flex items-center gap-3 pt-4 border-t border-theme">
-              <div
-                className={`w-10 h-10 rounded-full flex-shrink-0 overflow-hidden border-2 border-purple-500/30 ${!t.image ? `bg-gradient-to-br ${t.color}` : ""}`}
-              >
-                {t.image ? (
-                  <img
-                    src={t.image}
-                    alt={t.name}
-                    className="w-full h-full object-cover object-top"
-                  />
-                ) : (
-                  <div
-                    className={`w-full h-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm`}
-                  >
-                    {t.avatar}
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="text-theme-primary font-semibold text-sm">
-                  {t.name}
-                </p>
-                <p className="text-theme-muted text-xs">
-                  {t.role} @ {t.company}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Controls */}
-      <div className="flex items-center justify-center gap-4 mt-8">
-        <button
-          onClick={() => resetTimer(-1)}
-          className="w-9 h-9 rounded-full border border-theme text-theme-muted hover:text-purple-400 hover:border-purple-500/50 flex items-center justify-center transition"
-        >
-          <FaChevronLeft className="w-3.5 h-3.5" />
-        </button>
-        <div className="flex items-center gap-2">
-          {testimonials.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                setDirection(i > current ? 1 : -1);
-                setCurrent(i);
-                clearInterval(timerRef.current);
-              }}
-              className={`rounded-full transition-all duration-300 ${i === current ? "w-6 h-2 bg-purple-500" : "w-2 h-2 bg-theme-muted/30 hover:bg-purple-400/50"}`}
-            />
-          ))}
-        </div>
-        <button
-          onClick={() => resetTimer(1)}
-          className="w-9 h-9 rounded-full border border-theme text-theme-muted hover:text-purple-400 hover:border-purple-500/50 flex items-center justify-center transition"
-        >
-          <FaChevronRight className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// ── Main ──
+//  Main
 const Home = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -538,7 +270,7 @@ const Home = () => {
 
   return (
     <div className="bg-theme-primary text-theme-primary overflow-x-hidden">
-      {/* ══ HERO ══════════════════════════════════════════════════════ */}
+      {/*  HERO */}
       <section className="relative overflow-hidden border-b border-theme py-16 px-6">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-600 opacity-[0.06] rounded-full blur-[120px]" />
@@ -732,7 +464,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      {/* ══ PARTNER LOGO CAROUSEL ═════════════════════════════════════ */}
+      {/*  PARTNER LOGO CAROUSEL ═ */}
       <section className="py-10 border-b border-theme bg-theme-secondary">
         <p className="text-xs font-bold text-theme-muted uppercase tracking-widest text-center mb-6">
           Trusted by Top Companies
@@ -740,7 +472,7 @@ const Home = () => {
         <LogoCarousel />
       </section>
 
-      {/* ══ FEATURED JOBS ══════════════════════════════════════════════ */}
+      {/*  FEATURED JOBS  */}
       <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -789,7 +521,7 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-      {/* ══ INTERVIEW PREP ════════════════════════════════════════════ */}
+      {/*  INTERVIEW PREP  */}
       <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -824,27 +556,7 @@ const Home = () => {
             viewport={{ once: true }}
             className="grid grid-cols-1 md:grid-cols-3 gap-4"
           >
-            {[
-              {
-                level: "Beginner",
-                color:
-                  "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-                emoji: "💻",
-                q: "What is the difference between var, let, and const in JavaScript?",
-              },
-              {
-                level: "Common",
-                color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                emoji: "🤝",
-                q: "Tell me about yourself.",
-              },
-              {
-                level: "Intermediate",
-                color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-                emoji: "📊",
-                q: "How do you prioritize tasks when everything seems urgent?",
-              },
-            ].map((item, i) => (
+            {interviewquestions.map((item, i) => (
               <motion.div key={i} variants={scaleIn}>
                 <Link
                   to="/interview-questions"
@@ -878,7 +590,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      {/* ══ FEATURES ══════════════════════════════════════════════════ */}
+      {/*  FEATURES  */}
       <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -905,32 +617,7 @@ const Home = () => {
             viewport={{ once: true }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
           >
-            {[
-              {
-                icon: <FaBrain className="w-5 h-5" />,
-                title: "AI-Powered Matching",
-                desc: "Smart algorithm matches your skills with the perfect opportunities in real time.",
-                accent: "from-violet-500 to-purple-700",
-              },
-              {
-                icon: <FaChartLine className="w-5 h-5" />,
-                title: "Real-time Tracking",
-                desc: "Track your application status live — from Applied to Hired instantly.",
-                accent: "from-blue-500 to-cyan-600",
-              },
-              {
-                icon: <FaRocket className="w-5 h-5" />,
-                title: "Fast Applications",
-                desc: "One-click apply with your saved CV. No repetitive form filling.",
-                accent: "from-rose-500 to-pink-700",
-              },
-              {
-                icon: <FaShieldAlt className="w-5 h-5" />,
-                title: "Verified Companies",
-                desc: "Every employer is verified to ensure safe, legitimate listings.",
-                accent: "from-emerald-500 to-teal-700",
-              },
-            ].map((f, i) => (
+            {jobhunters.map((f, i) => (
               <motion.div
                 key={i}
                 variants={scaleIn}
@@ -953,7 +640,7 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-      {/* ══ TESTIMONIALS CAROUSEL ════════════════════════════════════ */}
+      {/*  TESTIMONIALS CAROUSEL  */}
       <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -983,7 +670,7 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-      {/* ══ HOW IT WORKS ══════════════════════════════════════════════ */}
+      {/*  HOW IT WORKS  */}
       <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -1059,7 +746,7 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-      {/* ══ APP DOWNLOAD — light/dark mode fixed ═══════════════════════ */}
+      {/*  APP DOWNLOAD — light/dark mode fixed ═ */}
       <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -1153,7 +840,7 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-      {/* ══ CTA ═══════════════════════════════════════════════════════ */}
+      {/*  CTA ═ */}
       <section className="py-16 px-6 bg-theme-secondary border-t border-theme">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div

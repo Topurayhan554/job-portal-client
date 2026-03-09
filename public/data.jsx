@@ -1,4 +1,32 @@
-import { FiCheckCircle, FiHeart, FiTarget, FiZap } from "react-icons/fi";
+import {
+  FaBrain,
+  FaBriefcase,
+  FaChartLine,
+  FaRocket,
+  FaShieldAlt,
+} from "react-icons/fa";
+import {
+  FiCheckCircle,
+  FiHeart,
+  FiTarget,
+  FiZap,
+  FiHome,
+  FiUser,
+  FiMessageSquare,
+  FiFileText,
+  FiSearch,
+  FiBookmark,
+  FiStar,
+  FiFile,
+  FiEye,
+  FiBell,
+  FiSettings,
+  FiUsers,
+  FiGrid,
+  FiPlusCircle,
+  FiClipboard,
+  FiShield,
+} from "react-icons/fi";
 
 export const questions = [
   // ── Tech ──
@@ -209,3 +237,217 @@ export const team = [
     image: "/team/sabrina.jpg",
   },
 ];
+export const partnerLogos = [
+  {
+    name: "bKash",
+    image: "/partners/bkash.png",
+    bg: "bg-pink-50    dark:bg-pink-950/40",
+    border: "border-pink-200    dark:border-pink-800/40",
+  },
+  {
+    name: "Pathao",
+    image: "/partners/pathao.png",
+    bg: "bg-orange-50  dark:bg-orange-950/40",
+    border: "border-orange-200  dark:border-orange-800/40",
+  },
+  {
+    name: "ShajGoj",
+    image: "/partners/shajgoj.png",
+    bg: "bg-teal-50    dark:bg-teal-950/40",
+    border: "border-teal-200    dark:border-teal-800/40",
+  },
+  {
+    name: "Chaldal",
+    image: "/partners/chaldal.png",
+    bg: "bg-green-50   dark:bg-green-950/40",
+    border: "border-green-200   dark:border-green-800/40",
+  },
+  {
+    name: "Shikho",
+    image: "/partners/shikho.png",
+    bg: "bg-violet-50  dark:bg-violet-950/40",
+    border: "border-violet-200  dark:border-violet-800/40",
+  },
+  {
+    name: "10 Minute School",
+    image: "/partners/10minuteschool.png",
+    bg: "bg-blue-50    dark:bg-blue-950/40",
+    border: "border-blue-200    dark:border-blue-800/40",
+  },
+  {
+    name: "Augmedix",
+    image: "/partners/augmedix.png",
+    bg: "bg-red-50     dark:bg-red-950/40",
+    border: "border-red-200     dark:border-red-800/40",
+  },
+  {
+    name: "CMED Health",
+    image: "/partners/CMDHealth.png",
+    bg: "bg-sky-50     dark:bg-sky-950/40",
+    border: "border-sky-200     dark:border-sky-800/40",
+  },
+  {
+    name: "Khaas Food",
+    image: "/partners/khaasfood.png",
+    bg: "bg-lime-50    dark:bg-lime-950/40",
+    border: "border-lime-200    dark:border-lime-800/40",
+  },
+  {
+    name: "Shohoz",
+    image: "/partners/shohoz.png",
+    bg: "bg-fuchsia-50 dark:bg-fuchsia-950/40",
+    border: "border-fuchsia-200 dark:border-fuchsia-800/40",
+  },
+];
+export const testimonials = [
+  {
+    name: "Rafiq Ahmed",
+    role: "Software Engineer",
+    company: "Pathao",
+    text: "This platform is a complete help for the job market in Bangladesh. Found my dream job within 2 weeks of signing up. Highly recommended!",
+    avatar: "R",
+    color: "from-violet-600 to-blue-600",
+    rating: 5,
+    image: "/testimonials/rafiq.jpg",
+  },
+  {
+    name: "Nadia Islam",
+    role: "Product Designer",
+    company: "bKash",
+    text: "I got three job offers after registering here. The interview prep section was incredibly helpful and the company quality is outstanding.",
+    avatar: "N",
+    color: "from-pink-500 to-rose-500",
+    rating: 5,
+    image: "/testimonials/nadia.jpg",
+  },
+  {
+    name: "Mizanur Rahman",
+    role: "Marketing Manager",
+    company: "Shikho",
+    text: "As an experienced professional, I was skeptical — but the quality of listings here is genuinely better than anywhere else. Got hired in a month!",
+    avatar: "M",
+    color: "from-emerald-500 to-teal-500",
+    rating: 5,
+    image: "/testimonials/mizanur.jpg",
+  },
+  {
+    name: "Sadia Akter",
+    role: "HR Executive",
+    company: "Augmedix",
+    text: "The best job platform for Bangladesh. The filters are excellent and company verification gives real confidence. Highly recommend.",
+    avatar: "S",
+    color: "from-amber-500 to-orange-500",
+    rating: 5,
+    image: "/testimonials/sadia.jpg",
+  },
+  {
+    name: "Tanvir Hossain",
+    role: "Full Stack Developer",
+    company: "Chaldal",
+    text: "Applied to 5 jobs, got 3 interviews, accepted 1 amazing offer. The process was smooth and the platform is beautifully designed!",
+    avatar: "T",
+    color: "from-cyan-500 to-blue-500",
+    rating: 5,
+    image: "/testimonials/tanvir.jpg",
+  },
+];
+export const jobhunters = [
+  {
+    icon: <FaBrain className="w-5 h-5" />,
+    title: "AI-Powered Matching",
+    desc: "Smart algorithm matches your skills with the perfect opportunities in real time.",
+    accent: "from-violet-500 to-purple-700",
+  },
+  {
+    icon: <FaChartLine className="w-5 h-5" />,
+    title: "Real-time Tracking",
+    desc: "Track your application status live — from Applied to Hired instantly.",
+    accent: "from-blue-500 to-cyan-600",
+  },
+  {
+    icon: <FaRocket className="w-5 h-5" />,
+    title: "Fast Applications",
+    desc: "One-click apply with your saved CV. No repetitive form filling.",
+    accent: "from-rose-500 to-pink-700",
+  },
+  {
+    icon: <FaShieldAlt className="w-5 h-5" />,
+    title: "Verified Companies",
+    desc: "Every employer is verified to ensure safe, legitimate listings.",
+    accent: "from-emerald-500 to-teal-700",
+  },
+];
+export const interviewquestions = [
+  {
+    level: "Beginner",
+    color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    emoji: "💻",
+    q: "What is the difference between var, let, and const in JavaScript?",
+  },
+  {
+    level: "Common",
+    color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    emoji: "🤝",
+    q: "Tell me about yourself.",
+  },
+  {
+    level: "Intermediate",
+    color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    emoji: "📊",
+    q: "How do you prioritize tasks when everything seems urgent?",
+  },
+];
+//  Sidebar Links
+export const sidebarLinks = {
+  seeker: [
+    { label: "Dashboard", path: "/seeker/dashboard", icon: <FiHome /> },
+    { label: "Profile", path: "/seeker/profile", icon: <FiUser /> },
+    { label: "Messages", path: "/seeker/messages", icon: <FiMessageSquare /> },
+    {
+      label: "Applied Jobs",
+      path: "/seeker/applications",
+      icon: <FiFileText />,
+    },
+    { label: "Find Jobs", path: "/jobs", icon: <FiSearch /> },
+    { label: "Saved Jobs", path: "/seeker/saved", icon: <FiBookmark /> },
+    { label: "Recommended", path: "/seeker/recommended", icon: <FiStar /> },
+    { label: "CV Manager", path: "/seeker/cv", icon: <FiFile /> },
+
+    { label: "Profile Views", path: "/seeker/views", icon: <FiEye /> },
+    { label: "Notifications", path: "/seeker/notifications", icon: <FiBell /> },
+    { label: "Settings", path: "/seeker/settings", icon: <FiSettings /> },
+  ],
+  employer: [
+    { label: "Dashboard", path: "/employer/dashboard", icon: <FiHome /> },
+    { label: "Profile", path: "/employer/profile", icon: <FiUser /> },
+    { label: "Post a Job", path: "/employer/post-job", icon: <FiPlusCircle /> },
+    { label: "My Jobs", path: "/employer/jobs", icon: <FaBriefcase /> },
+    { label: "Applicants", path: "/employer/applicants", icon: <FiUsers /> },
+    {
+      label: "Messages",
+      path: "/employer/messages",
+      icon: <FiMessageSquare />,
+    },
+    {
+      label: "Notifications",
+      path: "/employer/notifications",
+      icon: <FiBell />,
+    },
+    { label: "Settings", path: "/employer/settings", icon: <FiSettings /> },
+  ],
+  admin: [
+    { label: "Dashboard", path: "/admin/dashboard", icon: <FiGrid /> },
+    { label: "Profile", path: "/admin/profile", icon: <FiUser /> },
+    { label: "Manage Users", path: "/admin/users", icon: <FiUsers /> },
+    { label: "Manage Jobs", path: "/admin/jobs", icon: <FiClipboard /> },
+    {
+      label: "Applications",
+      path: "/admin/applications",
+      icon: <FiFileText />,
+    },
+    { label: "Messages", path: "/admin/messages", icon: <FiMessageSquare /> },
+    { label: "Notifications", path: "/admin/notifications", icon: <FiBell /> },
+    { label: "Settings", path: "/admin/settings", icon: <FiSettings /> },
+    { label: "Security", path: "/admin/security", icon: <FiShield /> },
+  ],
+};
