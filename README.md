@@ -16,7 +16,7 @@
 
 |                 | URL                                                                                          |
 | --------------- | -------------------------------------------------------------------------------------------- |
-| **Frontend**    | [job-portal-client-sigma-azure.vercel.app](https://job-portal-client-sigma-azure.vercel.app) |
+| **Frontend**    | [job-portal-client-sigma-azure.vercel.app](https://kaajkhojo-sigma-azure.vercel.app/) |
 | **Backend API** | [job-portal-server-livid-seven.vercel.app](https://job-portal-server-livid-seven.vercel.app) |
 
 ---
