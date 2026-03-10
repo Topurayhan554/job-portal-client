@@ -84,7 +84,9 @@ kaajkhojo/
 │   ├── src/
 │   │   ├── components/         # Reusable UI components
 │   │   ├── context/            # Auth context
+│   │   ├── firebase/
 │   │   ├── hooks/              # Custom hooks
+│   │   ├── layouts/
 │   │   ├── pages/              # Page components
 │   │   │   ├── admin/
 │   │   │   ├── auth/
@@ -94,10 +96,17 @@ kaajkhojo/
 │   │   │   └── shared/
 │   │   ├── routes/             # React Router config
 │   │   └── services/           # API service
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── .gitignore
+│   │   ├── index.html
+│   │   ├── package.json
+│   │   ├── README.md
 │   └── vercel.json
 │
 └── job-portal-server/          # Express backend
     ├── config/                 # DB connection
+    ├── controllers/
     ├── middleware/             # Auth middleware
     ├── models/                 # Mongoose models
     │   ├── User.js
@@ -106,7 +115,8 @@ kaajkhojo/
     │   └── InterviewQuestion.js
     ├── routes/                 # Express routes
     ├── utils/                  # Helper functions
-    ├── server.js
+    ├── index.js
+    ├── package.json
     └── vercel.json
 ```
 
@@ -125,14 +135,13 @@ kaajkhojo/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/kaajkhojo.git
-cd kaajkhojo
+git clone https://github.com/Topurayhan554/job-portal-client
 ```
 
 ### 2. Backend Setup
 
 ```bash
-cd job-portal-server
+git clone https://github.com/Topurayhan554/job-portal-server
 npm install
 ```
 
@@ -239,7 +248,7 @@ Add all `VITE_*` environment variables in Vercel dashboard.
 
 ## 📄 License
 
-MIT License © 2024 [Topu Rayhan](https://github.com/your-username)
+MIT License © 2024 [Topu Rayhan](https://github.com/Topurayhan554)
 
 ---
 
