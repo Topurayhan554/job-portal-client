@@ -1,5 +1,7 @@
 # KaajKhojo — Bangladesh's #1 Job Portal
 
+**KaajKhojo** (কাজ খোজো) is a full-stack job portal built for Bangladesh — connecting job seekers with verified employers through an AI-powered platform. Features include smart CV analysis, real-time application tracking, interview preparation, and role-based dashboards for seekers, employers, and admins.
+
 ![KaajKhojo](https://img.shields.io/badge/KaajKhojo-Job%20Portal-7c3aed?style=for-the-badge)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
 ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js)
