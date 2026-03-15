@@ -1,26 +1,18 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaBriefcase,
   FaSearch,
   FaRocket,
-  FaBrain,
-  FaChartLine,
-  FaShieldAlt,
   FaArrowRight,
-  FaStar,
-  FaQuoteLeft,
   FaAppStore,
   FaGooglePlay,
-  FaChevronLeft,
-  FaChevronRight,
 } from "react-icons/fa";
 import {
   FiUsers,
   FiCheckCircle,
   FiArrowUpRight,
-  FiClock,
   FiMapPin,
   FiChevronRight,
 } from "react-icons/fi";
@@ -32,6 +24,7 @@ import {
   testimonials,
 } from "../../public/data";
 import JobCardSkeleton from "./common/JobCardSkeleton";
+import JobCard from "./common/JobCard";
 import LogoCarousel from "./common/LogoCarousel";
 import TestimonialCarousel from "./common/TestimonialCarousel";
 
@@ -44,10 +37,12 @@ const fadeUp = {
     transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
-const stagger = { visible: { transition: { staggerChildren: 0.07 } } };
+// faster stagger — cards appear quickly
+const stagger = { visible: { transition: { staggerChildren: 0.04 } } };
+// subtle scale — no jarring pop
 const scaleIn = {
-  hidden: { opacity: 0, scale: 0.93, y: 8 },
-  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.4 } },
+  hidden: { opacity: 0, scale: 0.96, y: 6 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.25 } },
 };
 
 const typeColors = {
@@ -58,16 +53,6 @@ const typeColors = {
   Internship: "bg-pink-500/10 text-pink-400 border border-pink-500/20",
 };
 
-const jobCategories = [
-  "All",
-  "Technology",
-  "Design",
-  "Marketing",
-  "Finance",
-  "Management",
-  "HR",
-  "Sales",
-];
 const popularTags = [
   "React Developer",
   "UI Designer",
@@ -77,16 +62,6 @@ const popularTags = [
   "Full-time",
 ];
 
-const quickLinks = [
-  { label: "All Jobs (750+)", href: "/jobs" },
-  { label: "Fresher Jobs (12)", href: "/jobs?experience=Entry Level" },
-  { label: "Internship (7)", href: "/jobs?type=Internship" },
-  { label: "Walk-in Interviews (4)", href: "/jobs" },
-  { label: "Remote Jobs (42)", href: "/jobs?type=Remote" },
-];
-
-//  Skeletons
-
 const StatSkeleton = () => (
   <div className="animate-pulse card-theme border rounded-2xl p-4">
     <div className="h-7 bg-theme-primary/20 rounded w-20 mb-1" />
@@ -94,95 +69,18 @@ const StatSkeleton = () => (
   </div>
 );
 
-//  Job Card
-const JobCard = ({ job }) => {
-  const salary =
-    job.salaryMin && job.salaryMax
-      ? `৳${(job.salaryMin / 1000).toFixed(0)}k–${(job.salaryMax / 1000).toFixed(0)}k`
-      : job.salaryMin
-        ? `৳${(job.salaryMin / 1000).toFixed(0)}k+`
-        : "Negotiable";
-  return (
-    <Link
-      to={`/jobs/${job._id}`}
-      className="group card-theme block border hover:border-purple-500/40 rounded-2xl p-5 transition-all duration-300 hover:bg-purple-500/[0.03]"
-    >
-      <div className="flex items-start gap-3 mb-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-purple-500/15 to-blue-500/15 border border-theme rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
-          {job.postedBy?.profilePhoto ? (
-            <img
-              src={job.postedBy.profilePhoto}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <FaBriefcase className="text-purple-400 w-4 h-4" />
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-theme-primary font-semibold text-sm leading-snug group-hover:text-purple-400 transition truncate">
-            {job.title}
-          </h3>
-          <p className="text-theme-muted text-xs mt-0.5">
-            {job.company || job.postedBy?.companyName}
-          </p>
-        </div>
-        {job.featured && (
-          <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
-            <FaStar className="w-2 h-2 fill-current" /> Featured
-          </span>
-        )}
-      </div>
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        <span
-          className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${typeColors[job.type] || "bg-gray-500/10 text-gray-400"}`}
-        >
-          {job.type}
-        </span>
-        {(job.skills || []).slice(0, 2).map((s) => (
-          <span
-            key={s}
-            className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full"
-          >
-            {s}
-          </span>
-        ))}
-      </div>
-      <div className="border-t border-theme pt-3 flex items-center justify-between">
-        <div className="flex items-center gap-3 text-xs text-theme-muted">
-          <span className="flex items-center gap-1">
-            <FiMapPin className="w-3 h-3" />
-            {job.location}
-          </span>
-          <span className="flex items-center gap-1">
-            <FiClock className="w-3 h-3" />
-            {new Date(job.createdAt).toLocaleDateString()}
-          </span>
-        </div>
-        <span className="text-purple-400 font-bold text-sm">{salary}</span>
-      </div>
-    </Link>
-  );
-};
-
-// Carousel
-<LogoCarousel />;
-
-//  Testimonial Carousel
-<TestimonialCarousel />;
-
-//  Main
 const Home = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState("All");
   const [featuredJobs, setFeaturedJobs] = useState([]);
   const [liveJobs, setLiveJobs] = useState([]);
+  const [activeTab, setActiveTab] = useState("All");
   const [jobsLoading, setJobsLoading] = useState(true);
   const [liveLoading, setLiveLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
+  // Featured jobs
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -207,6 +105,7 @@ const Home = () => {
     fetch();
   }, []);
 
+  // Live jobs by category
   useEffect(() => {
     const fetch = async () => {
       setLiveLoading(true);
@@ -223,6 +122,7 @@ const Home = () => {
     fetch();
   }, [activeTab]);
 
+  // Stats
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -270,7 +170,7 @@ const Home = () => {
 
   return (
     <div className="bg-theme-primary text-theme-primary overflow-x-hidden">
-      {/*  HERO */}
+      {/*  HERO  */}
       <section className="relative overflow-hidden border-b border-theme py-16 px-6">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-600 opacity-[0.06] rounded-full blur-[120px]" />
@@ -464,7 +364,8 @@ const Home = () => {
           </div>
         </div>
       </section>
-      {/*  PARTNER LOGO CAROUSEL ═ */}
+
+      {/*  PARTNER LOGOS  */}
       <section className="py-10 border-b border-theme bg-theme-secondary">
         <p className="text-xs font-bold text-theme-muted uppercase tracking-widest text-center mb-6">
           Trusted by Top Companies
@@ -472,14 +373,16 @@ const Home = () => {
         <LogoCarousel />
       </section>
 
-      {/*  FEATURED JOBS  */}
+      {/*  FEATURED JOBS 
+           key={featuredJobs.length} — data আসার সাথে সাথে re-animate করে
+           animate="visible" — scroll লাগবে না
+      */}
       <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
         <div className="max-w-7xl mx-auto">
           <motion.div
             variants={fadeUp}
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+            animate="visible"
             className="flex items-end justify-between mb-10"
           >
             <div>
@@ -500,11 +403,12 @@ const Home = () => {
               View All <FiArrowUpRight className="w-4 h-4" />
             </Link>
           </motion.div>
+
           <motion.div
+            key={featuredJobs.length}
             variants={stagger}
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+            animate="visible"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {jobsLoading
@@ -521,6 +425,7 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
+
       {/*  INTERVIEW PREP  */}
       <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
@@ -590,6 +495,7 @@ const Home = () => {
           </div>
         </div>
       </section>
+
       {/*  FEATURES  */}
       <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
         <div className="max-w-7xl mx-auto">
@@ -640,7 +546,8 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-      {/*  TESTIMONIALS CAROUSEL  */}
+
+      {/*  TESTIMONIALS  */}
       <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -670,6 +577,7 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
+
       {/*  HOW IT WORKS  */}
       <section className="py-16 px-6 bg-theme-secondary border-y border-theme">
         <div className="max-w-4xl mx-auto">
@@ -746,7 +654,8 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-      {/*  APP DOWNLOAD — light/dark mode fixed ═ */}
+
+      {/*  APP DOWNLOAD  */}
       <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -768,7 +677,6 @@ const Home = () => {
                 }}
               />
             </div>
-
             <div className="relative grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-5 uppercase tracking-wider">
@@ -817,7 +725,6 @@ const Home = () => {
                   ))}
                 </div>
               </div>
-
               <div className="hidden md:grid grid-cols-3 gap-3">
                 {[
                   { label: "5★", sub: "App Rating", emoji: "⭐" },
@@ -840,7 +747,8 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
-      {/*  CTA ═ */}
+
+      {/*  CTA  */}
       <section className="py-16 px-6 bg-theme-secondary border-t border-theme">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div
