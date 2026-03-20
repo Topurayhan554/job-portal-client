@@ -380,7 +380,7 @@ const AdminDashboard = () => {
             <FiBriefcase className="text-red-500 w-4 h-4" /> Recent Jobs
           </h3>
           <Link
-            to="/admin/manage-jobs"
+            to="/admin/jobs"
             className="text-red-500 hover:text-red-400 text-sm flex items-center gap-1"
           >
             View all <FiArrowRight className="w-3 h-3" />
