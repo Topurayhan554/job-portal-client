@@ -1,5 +1,7 @@
 # KaajKhojo — Bangladesh's #1 Job Portal
 
+**KaajKhojo** (কাজ খোজো) is a full-stack job portal built for Bangladesh — connecting job seekers with verified employers through an AI-powered platform. Features include smart CV analysis, real-time application tracking, interview preparation, and role-based dashboards for seekers, employers, and admins.
+
 ![KaajKhojo](https://img.shields.io/badge/KaajKhojo-Job%20Portal-7c3aed?style=for-the-badge)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
 ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js)
@@ -14,7 +16,7 @@
 
 |                 | URL                                                                                          |
 | --------------- | -------------------------------------------------------------------------------------------- |
-| **Frontend**    | [job-portal-client-sigma-azure.vercel.app](https://job-portal-client-sigma-azure.vercel.app) |
+| **Frontend**    | [job-portal-client-sigma-azure.vercel.app](https://kaajkhojo-sigma-azure.vercel.app/) |
 | **Backend API** | [job-portal-server-livid-seven.vercel.app](https://job-portal-server-livid-seven.vercel.app) |
 
 ---
@@ -84,21 +86,29 @@ kaajkhojo/
 │   ├── src/
 │   │   ├── components/         # Reusable UI components
 │   │   ├── context/            # Auth context
+│   │   ├── firebase/
 │   │   ├── hooks/              # Custom hooks
+│   │   ├── layouts/
 │   │   ├── pages/              # Page components
-│   │   │   ├── Home.jsx
-│   │   │   ├── About.jsx
-│   │   │   ├── InterviewQuestions.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── seeker/
+│   │   │   ├── admin/
+│   │   │   ├── auth/
 │   │   │   ├── employer/
-│   │   │   └── admin/
+│   │   │   ├── job/
+│   │   │   ├── seeker/
+│   │   │   └── shared/
 │   │   ├── routes/             # React Router config
 │   │   └── services/           # API service
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── .gitignore
+│   │   ├── index.html
+│   │   ├── package.json
+│   │   ├── README.md
 │   └── vercel.json
 │
 └── job-portal-server/          # Express backend
     ├── config/                 # DB connection
+    ├── controllers/
     ├── middleware/             # Auth middleware
     ├── models/                 # Mongoose models
     │   ├── User.js
@@ -107,7 +117,8 @@ kaajkhojo/
     │   └── InterviewQuestion.js
     ├── routes/                 # Express routes
     ├── utils/                  # Helper functions
-    ├── server.js
+    ├── index.js
+    ├── package.json
     └── vercel.json
 ```
 
@@ -126,14 +137,13 @@ kaajkhojo/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/kaajkhojo.git
-cd kaajkhojo
+git clone https://github.com/Topurayhan554/job-portal-client
 ```
 
 ### 2. Backend Setup
 
 ```bash
-cd job-portal-server
+git clone https://github.com/Topurayhan554/job-portal-server
 npm install
 ```
 
@@ -240,7 +250,7 @@ Add all `VITE_*` environment variables in Vercel dashboard.
 
 ## 📄 License
 
-MIT License © 2024 [Topu Rayhan](https://github.com/your-username)
+MIT License © 2024 [Topu Rayhan](https://github.com/Topurayhan554)
 
 ---
 
